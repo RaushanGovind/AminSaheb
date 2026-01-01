@@ -4,9 +4,9 @@ class SettingsManager {
     constructor(app) {
         this.app = app;
         const defaultPrecisions = {
-            "बीघा": 4, "कट्ठा": 4, "धुर": 4, "धुर्की": 4, "फुर्की": 4, "चुरकी": 4, "कनमा": 4,
-            "डिसमिल": 4, "एकड़": 4, "हेक्टेयर": 4,
-            "वर्ग फीट": 2, "वर्ग मीटर": 2, "वर्ग गज": 2, "कड़ी": 2, "हाथ": 2, "फीट": 2
+            "बीघा": 4, "कट्ठा": 4, "धुर": 4, "धुरकी": 4, "फुरकी": 4, "चुरकी": 4, "कनबा": 4,
+            "डिसमिल": 4, "एकड़": 4, "हेक्टर": 4,
+            "वर्ग फीट": 2, "वर्ग मीटर": 2, "वर्ग गज": 2, "कड़ी": 2, "हाथ": 2, "फीट": 2
         };
 
         try {
@@ -14,6 +14,8 @@ class SettingsManager {
                 lang: 'hi',
                 theme: 'clean',
                 font: 'var(--font-primary)',
+                fontSize: 15,
+                textColor: '#1a202c',
                 accentColor: '#3b82f6',
                 tradPrecision: 4,
                 stdPrecision: 4,
@@ -93,7 +95,9 @@ class SettingsManager {
             closeSettings: document.getElementById('closeSettings'),
             langHi: document.getElementById('langHi'),
             langEn: document.getElementById('langEn'),
-            fontSelect: document.getElementById('fontSelect'),
+            fontSizeRange: document.getElementById('fontSizeRange'),
+            fontSizeValue: document.getElementById('fontSizeValue'),
+            textColorPicker: document.getElementById('textColorPicker'),
             colorPicker: document.getElementById('accentColorPicker'),
             tradPrecision: document.getElementById('tradPrecision'),
             stdPrecision: document.getElementById('stdPrecision'),
@@ -101,6 +105,18 @@ class SettingsManager {
             resetBtn: document.getElementById('resetSettings'),
             themeOptions: document.querySelectorAll('.theme-option')
         };
+
+        if (elements.fontSizeRange) {
+            elements.fontSizeRange.oninput = (e) => {
+                const val = e.target.value;
+                if (elements.fontSizeValue) elements.fontSizeValue.textContent = `${val}px`;
+                this.updateSetting('fontSize', parseInt(val));
+            };
+        }
+
+        if (elements.textColorPicker) {
+            elements.textColorPicker.onchange = (e) => this.updateSetting('textColor', e.target.value);
+        }
 
         if (elements.settingsBtn) elements.settingsBtn.onclick = () => elements.settingsModal.classList.remove('hidden');
         if (elements.closeSettings) elements.closeSettings.onclick = () => elements.settingsModal.classList.add('hidden');
@@ -176,6 +192,19 @@ class SettingsManager {
         if (theme.text) document.documentElement.style.setProperty('--text-primary', theme.text);
         if (theme.secondary) document.documentElement.style.setProperty('--gradient-secondary', `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 100%)`);
 
+        // Apply text color
+        if (this.settings.textColor) {
+            document.documentElement.style.setProperty('--text-primary', this.settings.textColor);
+        } else if (theme.text) {
+            document.documentElement.style.setProperty('--text-primary', theme.text);
+        }
+
+        // Apply font size
+        if (this.settings.fontSize) {
+            document.documentElement.style.setProperty('--font-base', `${this.settings.fontSize / 16}rem`);
+            // Adjust other font sizes relatively if needed, but --font-base is the root anchor
+        }
+
         // Handle background white replacement - Use theme's specific bgWhite or default context
         if (theme.bgWhite) {
             document.documentElement.style.setProperty('--bg-white', theme.bgWhite);
@@ -203,6 +232,13 @@ class SettingsManager {
         if (langHi) langHi.checked = this.settings.lang === 'hi';
         if (fontSelect) fontSelect.value = this.settings.font;
         if (colorPicker) colorPicker.value = this.settings.accentColor;
+        if (document.getElementById('fontSizeRange')) {
+            document.getElementById('fontSizeRange').value = this.settings.fontSize || 16;
+            document.getElementById('fontSizeValue').textContent = `${this.settings.fontSize || 16}px`;
+        }
+        if (document.getElementById('textColorPicker')) {
+            document.getElementById('textColorPicker').value = this.settings.textColor || (theme.text || '#1a202c');
+        }
         if (tradPrecision) tradPrecision.value = this.settings.tradPrecision || 4;
         if (stdPrecision) stdPrecision.value = this.settings.stdPrecision || 4;
         if (defaultCalc) defaultCalc.value = this.settings.defaultCalc || 'none';
@@ -239,6 +275,8 @@ class SettingsManager {
         safeSetText('langLabel', t.langLabel);
         safeSetText('themeLabel', t.themeLabel);
         safeSetText('fontLabel', t.fontLabel);
+        safeSetText('fontSizeLabel', t.fontSizeLabel);
+        safeSetText('textColorLabel', t.textColorLabel);
         safeSetText('colorLabel', t.colorLabel);
         safeSetText('precisionLabel', t.precisionLabel);
         safeSetText('tradPrecisionLabel', t.tradPrecisionLabel);

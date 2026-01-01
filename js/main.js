@@ -15,16 +15,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (startBtn && landerPage) {
             startBtn.addEventListener('click', () => {
-                landerPage.classList.add('fade-out');
-                setTimeout(() => {
-                    landerPage.classList.add('hidden');
-                    header.classList.remove('hidden');
-                    mainApp.classList.remove('hidden');
-                    mainFooter.classList.remove('hidden');
-
-                    // Trigger animation class if needed
-                    mainApp.classList.add('fade-in');
-                }, 500);
+                if (window.appInstance) {
+                    window.appInstance.startApp();
+                } else {
+                    // Fallback if appInstance is not yet ready
+                    landerPage.classList.add('fade-out');
+                    setTimeout(() => {
+                        landerPage.classList.add('hidden');
+                        if (header) header.classList.remove('hidden');
+                        if (mainApp) mainApp.classList.remove('hidden');
+                        if (mainFooter) mainFooter.classList.remove('hidden');
+                    }, 500);
+                }
             });
         }
     } else {

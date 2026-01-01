@@ -13,38 +13,93 @@ class SmartCalculatorApp {
     applyDefaultCalculator() {
         const defaultCalc = this.settings.settings.defaultCalc;
         if (defaultCalc && defaultCalc !== 'none') {
-            // Hide lander immediately if a default is set
-            const landerPage = document.getElementById('landerPage');
-            const header = document.querySelector('.header');
-            const mainApp = document.getElementById('mainApp');
-            const mainFooter = document.getElementById('mainFooter');
-
-            if (landerPage) {
-                landerPage.classList.add('hidden');
-                header.classList.remove('hidden');
-                mainApp.classList.remove('hidden');
-                mainFooter.classList.remove('hidden');
-            }
-
-            // Delay slightly to ensure UI is ready
+            this.startApp();
             setTimeout(() => {
                 this.switchToCalculator(defaultCalc);
-            }, 50);
+            }, 100);
         }
     }
 
+    startApp() {
+        const landerPage = document.getElementById('landerPage');
+        const header = document.querySelector('.header');
+        const mainApp = document.getElementById('mainApp');
+        const mainFooter = document.getElementById('mainFooter');
+
+        if (landerPage) landerPage.classList.add('fade-out');
+
+        setTimeout(() => {
+            if (landerPage) landerPage.classList.add('hidden');
+            if (header) header.classList.remove('hidden');
+            if (mainApp) mainApp.classList.remove('hidden');
+            if (mainFooter) mainFooter.classList.remove('hidden');
+
+            this.ui.showSelector();
+
+            if (mainApp) mainApp.classList.add('fade-in');
+        }, 500);
+    }
+
     initializeEventListeners() {
-        const calcCards = document.querySelectorAll('.calc-type-card');
-        calcCards.forEach(card => {
-            card.addEventListener('click', () => {
+        // Event Delegation for Slider Cards
+        document.addEventListener('click', (e) => {
+            const card = e.target.closest('.calc-type-card');
+            if (card && this.ui.elements.selector.contains(card)) {
                 const calcType = card.dataset.calcType;
                 this.switchToCalculator(calcType);
-            });
+            }
         });
+
+        // Header Navigation Dropdown
+        if (this.ui.elements.headerNav) {
+            this.ui.elements.headerNav.addEventListener('change', (e) => {
+                const calcType = e.target.value;
+                if (calcType === 'none') {
+                    this.goBack();
+                } else {
+                    this.switchToCalculator(calcType);
+                }
+            });
+        }
+
+        if (this.ui.elements.homeBtn) {
+            this.ui.elements.homeBtn.addEventListener('click', () => {
+                this.currentMode = null;
+                this.ui.showLander();
+                if (this.ui.elements.headerNav) this.ui.elements.headerNav.value = 'none';
+            });
+        }
 
         this.ui.elements.backBtn.addEventListener('click', () => {
             this.goBack();
         });
+
+        // AdSense Compliance Modals
+        if (this.ui.elements.aboutBtn) {
+            this.ui.elements.aboutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.ui.toggleAbout(true);
+            });
+        }
+        if (this.ui.elements.privacyBtn) {
+            this.ui.elements.privacyBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.ui.togglePrivacy(true);
+            });
+        }
+        if (this.ui.elements.closeAbout) {
+            this.ui.elements.closeAbout.addEventListener('click', () => this.ui.toggleAbout(false));
+        }
+        if (this.ui.elements.closePrivacy) {
+            this.ui.elements.closePrivacy.addEventListener('click', () => this.ui.togglePrivacy(false));
+        }
+
+        if (this.ui.elements.goProBtn) {
+            this.ui.elements.goProBtn.addEventListener('click', () => this.ui.togglePro(true));
+        }
+        if (this.ui.elements.closePro) {
+            this.ui.elements.closePro.addEventListener('click', () => this.ui.togglePro(false));
+        }
 
         this.ui.elements.calculateBtn.addEventListener('click', () => {
             this.handleCalculate();
@@ -75,6 +130,16 @@ class SmartCalculatorApp {
 
     switchToCalculator(calcType) {
         this.currentMode = calcType;
+
+        // Ensure lander is hidden and mainApp is shown
+        const landerPage = document.getElementById('landerPage');
+        const mainApp = document.getElementById('mainApp');
+        const mainFooter = document.getElementById('mainFooter');
+
+        if (landerPage) landerPage.classList.add('hidden');
+        if (mainApp) mainApp.classList.remove('hidden');
+        if (mainFooter) mainFooter.classList.remove('hidden');
+
         this.ui.hideSelector();
         this.ui.setTitle(calcType);
         this.ui.clearAll();
@@ -90,6 +155,8 @@ class SmartCalculatorApp {
                 this.setupAreaCalculator();
                 break;
             case 'triangle':
+                this.setupTriangleCalculator(calcType);
+                break;
             case 'square':
             case 'rectangle':
                 this.setupShapeCalculator(calcType);
@@ -110,15 +177,28 @@ class SmartCalculatorApp {
                 this.setupLaggiFinder();
                 break;
             case 'heron':
-                this.setupShapeCalculator('heron');
+                this.setupTriangleCalculator(calcType);
                 break;
         }
     }
 
     goBack() {
         this.currentMode = null;
+
+        // Ensure we show the app grid, not lander
+        const landerPage = document.getElementById('landerPage');
+        const mainApp = document.getElementById('mainApp');
+        const mainFooter = document.getElementById('mainFooter');
+
+        if (landerPage) landerPage.classList.add('hidden');
+        if (mainApp) mainApp.classList.remove('hidden');
+        if (mainFooter) mainFooter.classList.remove('hidden');
+
         this.ui.showSelector();
         this.ui.clearAll();
+        if (this.ui.elements.headerNav) {
+            this.ui.elements.headerNav.value = 'none';
+        }
     }
 
     setupBasicCalculator() {
@@ -193,11 +273,79 @@ class SmartCalculatorApp {
     setupShapeCalculator(shapeType) {
         this.ui.createShapeInputs(shapeType);
         this.ui.showCalculateButton();
+        this.attachShapeUnitListener();
+    }
+
+    setupTriangleCalculator(shapeType) {
+        this.ui.createShapeInputs(shapeType);
+        this.ui.showCalculateButton();
+        this.attachShapeUnitListener();
+
+        const baseBtn = document.getElementById('triangleModeBase');
+        const heronBtn = document.getElementById('triangleModeHeron');
+
+        if (baseBtn) {
+            baseBtn.addEventListener('click', () => {
+                this.switchToCalculator('triangle');
+            });
+        }
+        if (heronBtn) {
+            heronBtn.addEventListener('click', () => {
+                this.switchToCalculator('heron');
+            });
+        }
     }
 
     setupLaggiCalculator() {
         this.ui.createLaggiInputs();
         this.ui.showCalculateButton();
+    }
+
+    attachShapeUnitListener() {
+        const unitSelect = document.getElementById('shapeGlobalUnit');
+        const inputs = document.querySelectorAll('.shape-input');
+
+        if (unitSelect) {
+            this.ui.updateShapeUnitDisplay(unitSelect.value);
+            unitSelect.addEventListener('change', (e) => {
+                this.ui.updateShapeUnitDisplay(e.target.value);
+                this.updateLiveShapeCalculation();
+            });
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('input', () => this.updateLiveShapeCalculation());
+        });
+    }
+
+    updateLiveShapeCalculation() {
+        const globalUnit = document.getElementById('shapeGlobalUnit')?.value || 'फीट';
+        const inputs = document.querySelectorAll('.shape-input');
+        const values = {};
+        let allFilled = true;
+
+        inputs.forEach(input => {
+            const val = parseFloat(input.value);
+            if (isNaN(val) || val <= 0) {
+                allFilled = false;
+            }
+            const key = input.dataset.key;
+            values[key] = (val * lengthUnits[globalUnit]) / 12;
+        });
+
+        if (!allFilled) {
+            this.ui.updateLiveShapeArea(0);
+            return;
+        }
+
+        try {
+            const areaInSqFt = Calculator.calculateShape(this.currentMode, values);
+            const unitFactor = lengthUnits[globalUnit] / 12;
+            const areaInSelectedUnit = areaInSqFt / (unitFactor * unitFactor);
+            this.ui.updateLiveShapeArea(areaInSelectedUnit, globalUnit);
+        } catch (e) {
+            this.ui.updateLiveShapeArea(0);
+        }
     }
 
     setupLandConverter() {
@@ -229,6 +377,7 @@ class SmartCalculatorApp {
         this.ui.hideUnitSection();
         this.ui.hideLaggiSection();
         this.ui.createEstimatorUI();
+        this.ui.updateEstimatorHeader(this.estimatorGroup);
         this.ui.showCalculateButton();
 
         const groupSelect = document.getElementById('estimatorGroupSelect');
@@ -243,6 +392,14 @@ class SmartCalculatorApp {
             lastRow.querySelectorAll('.row-input').forEach(input => {
                 input.addEventListener('input', () => this.updateLiveTotal());
             });
+
+            // Add listener to remove buttons to update live total after deletion
+            const removeBtn = lastRow.querySelector('.remove-row-btn');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', () => {
+                    setTimeout(() => this.updateLiveTotal(), 50);
+                });
+            }
         };
 
         addNewRow();
@@ -251,6 +408,7 @@ class SmartCalculatorApp {
             groupSelect.addEventListener('change', (e) => {
                 this.estimatorGroup = e.target.value;
                 this.estimatorRows = 0;
+                this.ui.updateEstimatorHeader(this.estimatorGroup);
                 document.getElementById('estimatorRowsContainer').innerHTML = '';
                 this.updateLiveTotal();
                 addNewRow();
@@ -386,15 +544,19 @@ class SmartCalculatorApp {
             return;
         }
 
+        const globalUnit = document.getElementById('shapeGlobalUnit')?.value || 'फीट';
         const inputs = document.querySelectorAll('.shape-input');
         const values = {};
         inputs.forEach(input => {
-            values[input.dataset.key] = input.value;
+            const val = parseFloat(input.value) || 0;
+            const key = input.dataset.key;
+            values[key] = (val * lengthUnits[globalUnit]) / 12;
         });
 
         try {
             const area = Calculator.calculateShape(this.currentMode, values);
-            this.ui.displayShapeResult(this.currentMode, area, this.settings.settings);
+            const laggiHands = this.ui.getLaggiValueForShape();
+            this.ui.displayShapeResult(this.currentMode, area, this.settings.settings, laggiHands);
         } catch (error) {
             this.ui.displayError(error.message);
         }

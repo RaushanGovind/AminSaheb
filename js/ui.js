@@ -1,5 +1,3 @@
-// js/ui.js - यूजर इंटरफेस मैनेजर
-
 class UIManager {
     constructor() {
         this.elements = {
@@ -16,47 +14,176 @@ class UIManager {
             calculateBtn: document.getElementById('calculateBtn'),
             resultArea: document.getElementById('resultArea'),
             laggiSection: document.getElementById('laggiSection'),
-            areaLaggiHands: document.getElementById('areaLaggiHands')
+            areaLaggiHands: document.getElementById('areaLaggiHands'),
+            sliderContainer: document.querySelector('.slider-container'),
+            sliderDots: document.querySelector('.slider-dots'),
+            headerNav: document.getElementById('headerNavSelect'),
+            headerNavContainer: document.getElementById('headerNavContainer'),
+            homeBtn: document.getElementById('homeBtn'),
+            aboutModal: document.getElementById('aboutModal'),
+            privacyModal: document.getElementById('privacyModal'),
+            aboutBtn: document.getElementById('aboutBtn'),
+            privacyBtn: document.getElementById('privacyBtn'),
+            closeAbout: document.getElementById('closeAbout'),
+            closePrivacy: document.getElementById('closePrivacy'),
+            proModal: document.getElementById('proModal'),
+            closePro: document.getElementById('closePro'),
+            goProBtn: document.getElementById('goProBtn')
         };
         this.renderCalculatorCards();
+        this.setupSliderListeners();
+    }
+
+    formatLaggiValue(val) {
+        const whole = Math.floor(val);
+        const fraction = val - whole;
+        let fracStr = '';
+        if (fraction === 0.25) fracStr = '¼';
+        else if (fraction === 0.5) fracStr = '½';
+        else if (fraction === 0.75) fracStr = '¾';
+        return fracStr ? `${whole}${fracStr}` : `${whole}`;
     }
 
     renderCalculatorCards() {
-        const grid = document.querySelector('.calculator-grid');
+        const grid = document.querySelector('.slider-track');
         if (!grid || typeof calculatorCards === 'undefined') return;
 
         const lang = document.documentElement.lang || 'hi';
         const t = (translations[lang] && translations[lang].cardData) ? translations[lang].cardData : null;
 
-        grid.innerHTML = calculatorCards.map(card => {
+        grid.innerHTML = calculatorCards.map((card, index) => {
             const data = (t && t[card.id]) ? t[card.id] : card;
             return `
-                <div class="calc-type-card" data-calc-type="${card.id}">
+                <div class="calc-type-card ${index === 0 ? 'active-slide' : ''}" data-calc-type="${card.id}" data-index="${index}">
                     <div class="card-icon ${card.color || ''}" ${card.style ? `style="${card.style}"` : ''}>
                         ${card.tag || card.icon}
                     </div>
-                    <h3 class="card-title">${data.title}</h3>
-                    <p class="card-description">${data.desc}</p>
-                    <div class="card-features">
+                    <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
+                        <h3 class="card-title" style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">${data.title}</h3>
+                        <p class="card-description" style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 1rem;">${data.desc}</p>
+                    </div>
+                    <div class="card-features" style="justify-content: center; gap: 8px;">
                         ${data.features.map(f => `<span>${f}</span>`).join('')}
                     </div>
+                    <button class="btn-calculate" style="width: 100%; margin-top: 1.5rem; height: 50px; font-weight: bold; font-size: 1rem;">GO / शुरू करें</button>
                 </div>
             `;
         }).join('');
+
+        // Render Dots
+        if (this.elements.sliderDots) {
+            this.elements.sliderDots.innerHTML = calculatorCards.map((_, i) =>
+                `<div class="dot ${i === 0 ? 'active' : ''}" data-index="${i}"></div>`
+            ).join('');
+        }
+    }
+
+    setupSliderListeners() {
+        if (!this.elements.sliderContainer) return;
+
+        this.elements.sliderContainer.addEventListener('scroll', () => {
+            this.updateActiveSlide();
+        });
+
+        // Click on dots to scroll
+        const dots = this.elements.sliderDots.querySelectorAll('.dot');
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                const index = parseInt(dot.dataset.index);
+                this.scrollToIndex(index);
+            });
+        });
+    }
+
+    updateActiveSlide() {
+        const track = document.querySelector('.slider-track');
+        const cards = track.querySelectorAll('.calc-type-card');
+        const dots = this.elements.sliderDots.querySelectorAll('.dot');
+        const containerWidth = this.elements.sliderContainer.offsetWidth;
+        const scrollLeft = this.elements.sliderContainer.scrollLeft;
+
+        const activeIndex = Math.round(scrollLeft / (cards[0].offsetWidth + 24)); // 24 is gap
+
+        cards.forEach((card, i) => {
+            if (i === activeIndex) {
+                card.classList.add('active-slide');
+            } else {
+                card.classList.remove('active-slide');
+            }
+        });
+
+        dots.forEach((dot, i) => {
+            if (i === activeIndex) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    }
+
+    scrollToIndex(index) {
+        const cards = document.querySelectorAll('.calc-type-card');
+        if (cards[index]) {
+            const left = index * (cards[0].offsetWidth + 24);
+            this.elements.sliderContainer.scrollTo({
+                left: left,
+                behavior: 'smooth'
+            });
+        }
     }
 
     showSelector() {
         this.elements.selector.classList.remove('hidden');
         this.elements.interface.classList.add('hidden');
+        // headerNavContainer is kept visible for direct access
+        if (this.elements.headerNavContainer) {
+            this.elements.headerNavContainer.classList.remove('hidden');
+        }
+
+        // Ensure slider state is updated when shown
+        setTimeout(() => this.updateActiveSlide(), 50);
     }
 
     hideSelector() {
         this.elements.selector.classList.add('hidden');
         this.elements.interface.classList.remove('hidden');
+        this.elements.headerNavContainer.classList.remove('hidden');
     }
 
     setTitle(calcType) {
-        this.elements.calcTitle.textContent = calculatorTitles[calcType] || '';
+        const titleKey = (calcType === 'heron') ? 'triangle' : calcType;
+        const title = calculatorTitles[titleKey] || '';
+        this.elements.calcTitle.textContent = title;
+
+        // Update header nav select
+        if (this.elements.headerNav) {
+            this.elements.headerNav.value = calcType;
+        }
+    }
+
+    showLander() {
+        const landerPage = document.getElementById('landerPage');
+        if (landerPage) {
+            landerPage.classList.remove('hidden');
+            landerPage.classList.remove('fade-out');
+        }
+        this.elements.selector.classList.add('hidden');
+        this.elements.interface.classList.add('hidden');
+    }
+
+    toggleAbout(show) {
+        if (show) this.elements.aboutModal.classList.remove('hidden');
+        else this.elements.aboutModal.classList.add('hidden');
+    }
+
+    togglePrivacy(show) {
+        if (show) this.elements.privacyModal.classList.remove('hidden');
+        else this.elements.privacyModal.classList.add('hidden');
+    }
+
+    togglePro(show) {
+        if (show) this.elements.proModal.classList.remove('hidden');
+        else this.elements.proModal.classList.add('hidden');
     }
 
     showUnitSection(units) {
@@ -65,7 +192,7 @@ class UIManager {
         for (let unit in units) {
             const option = document.createElement('option');
             option.value = unit;
-            option.textContent = unit;
+            option.textContent = unitDisplayNames[unit] || unit;
             this.elements.unitType.appendChild(option);
         }
 
@@ -89,7 +216,7 @@ class UIManager {
         for (let i = 4; i <= 12; i += 0.25) {
             const option = document.createElement('option');
             option.value = i;
-            option.textContent = `${i} हाथ`;
+            option.textContent = `${this.formatLaggiValue(i)} हाथ (Hand)`;
             if (i === 5.5) option.selected = true;
             this.elements.areaLaggiHands.appendChild(option);
         }
@@ -146,9 +273,9 @@ class UIManager {
                         ${t.inputGroupLabel || 'कहाँ से (From)'}
                     </label>
                     <select id="specialGroupSelect" class="select-input">
-                        <option value="extended" selected>1. ${t.compositeFormat || 'बीघा-धुर-धुर्की'}</option>
-                        <option value="kanma">2. ${t.kanmaFormat || 'बीघा-कट्ठा-धुर-कनमा'}</option>
-                        <option value="modern">3. ${t.standardFormat || 'हेक्टेयर-एकड़-डिसमिल'}</option>
+                        <option value="extended" selected>1. ${t.compositeFormat || 'बीघा-धुर-धुरकी'}</option>
+                        <option value="kanma">2. ${t.kanbaFormat || 'बीघा-कट्ठा-धुर-कनबा'}</option>
+                        <option value="modern">3. ${t.standardFormat || 'हेक्टर-एकड़-डिसमिल'}</option>
                     </select>
                 </div>
                 <div class="calc-section" style="flex: 1.5;">
@@ -158,9 +285,9 @@ class UIManager {
                     </label>
                     <select id="specialTargetSelect" class="select-input">
                         <option value="all" selected>All Units (सभी इकाइयाँ)</option>
-                        <option value="extended">1. ${t.compositeFormat || 'बीघा-धुर-धुर्की'}</option>
-                        <option value="kanma">2. ${t.kanmaFormat || 'बीघा-कट्ठा-धुर-कनमा'}</option>
-                        <option value="modern">3. ${t.standardFormat || 'हेक्टेयर-एकड़-डिसमिल'}</option>
+                        <option value="extended">1. ${t.compositeFormat || 'बीघा-धुर-धुरकी'}</option>
+                        <option value="kanma">2. ${t.kanbaFormat || 'बीघा-कट्ठा-धुर-कनबा'}</option>
+                        <option value="modern">3. ${t.standardFormat || 'हेक्टर-एकड़-डिसमिल'}</option>
                     </select>
                 </div>
                 <div class="calc-section" style="flex: 1;">
@@ -179,7 +306,7 @@ class UIManager {
             for (let i = 4; i <= 12; i += 0.25) {
                 const option = document.createElement('option');
                 option.value = i;
-                option.textContent = `${i} हाथ`;
+                option.textContent = `${this.formatLaggiValue(i)} हाथ (Hand)`;
                 if (i === 5.5) option.selected = true;
                 laggiSelect.appendChild(option);
             }
@@ -196,8 +323,8 @@ class UIManager {
                 { label: 'बीघा', key: 'bigha' },
                 { label: 'कट्ठा', key: 'katha' },
                 { label: 'धुर', key: 'dhur' },
-                { label: 'धुर्की', key: 'dhurki' },
-                { label: 'फुर्की', key: 'furki' },
+                { label: 'धुरकी', key: 'dhurki' },
+                { label: 'फुरकी', key: 'furki' },
                 { label: 'चुरकी', key: 'churki' }
             ];
         } else if (group === 'kanma') {
@@ -205,12 +332,12 @@ class UIManager {
                 { label: 'बीघा', key: 'bigha' },
                 { label: 'कट्ठा', key: 'katha' },
                 { label: 'धुर', key: 'dhur' },
-                { label: 'कनमा', key: 'kanma' }
+                { label: 'कनबा', key: 'kanma' }
             ];
         } else if (group === 'modern') {
             fields = [
-                { label: 'हेक्टेयर', key: 'hectare' },
-                { label: 'एकड़', key: 'acre' },
+                { label: 'हेक्टर', key: 'hectare' },
+                { label: 'एकड़', key: 'acre' },
                 { label: 'डिसमिल', key: 'decimal' }
             ];
         }
@@ -235,18 +362,18 @@ class UIManager {
         const t = translations[document.documentElement.lang || 'hi'];
         this.elements.inputContainer.innerHTML = `
             <div class="special-top-row" style="margin-bottom: var(--space-6);">
-                <div class="calc-section" style="flex: 2;">
+                <div class="calc-section">
                     <label class="section-label">
                         <span class="label-icon">📂</span>
                         ${t.inputGroupLabel || 'इनपुट समूह चुनें'}
                     </label>
                     <select id="estimatorGroupSelect" class="select-input">
-                        <option value="extended" selected>1. ${t.compositeFormat || 'बीघा-धुर-धुर्की-फुर्की-चुरकी'}</option>
-                        <option value="kanma">2. ${t.kanmaFormat || 'बीघा-कट्ठा-धुर-कनमा'}</option>
-                        <option value="modern">3. ${t.standardFormat || 'हेक्टेयर-एकड़-डिसमिल'}</option>
+                        <option value="extended" selected>1. ${t.compositeFormat || 'बीघा-धुर-धुरकी-फुरकी-चुरकी'}</option>
+                        <option value="kanma">2. ${t.kanbaFormat || 'बीघा-कट्ठा-धुर-कनबा'}</option>
+                        <option value="modern">3. ${t.standardFormat || 'हेक्टर-एकड़-डिसमिल'}</option>
                     </select>
                 </div>
-                <div class="calc-section" style="flex: 1;">
+                <div class="calc-section">
                     <label class="section-label">
                         <span class="label-icon">📐</span>
                         लग्गी
@@ -254,28 +381,52 @@ class UIManager {
                     <select id="estimatorLaggi" class="select-input"></select>
                 </div>
             </div>
+
+            <div id="estimatorHeader" style="display: grid; padding: 10px 15px; background: var(--bg-primary); border-radius: var(--radius-md) var(--radius-md) 0 0; border: 1px solid var(--accent-100); border-bottom: none; margin-top: 20px;"></div>
             
-            <div id="estimatorRowsContainer" style="display: flex; flex-direction: column; gap: var(--space-4);"></div>
+            <div id="estimatorRowsContainer" style="display: flex; flex-direction: column; border: 1px solid var(--accent-100); border-top: none; border-radius: 0 0 var(--radius-md) var(--radius-md); background: var(--bg-white); overflow: hidden;"></div>
             
+            <button id="addRowBtn" class="btn-secondary" style="margin-top: var(--space-4); width: 100%; justify-content: center; padding: 14px; font-weight: bold; border: 2px dashed var(--accent-300); background: rgba(102, 126, 234, 0.05); color: var(--primary-600);">
+                ${t.addRowBtn || '+ पंक्ति जोड़ें'}
+            </button>
+
             <div id="liveTotalContainer" style="margin-top: var(--space-6); padding: var(--space-4); background: var(--gradient-primary); color: white; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); display: none;">
                 <div style="font-size: 0.8em; opacity: 0.9; margin-bottom: 5px; text-align: center;">कुल अनुमानित रकबा (Live Total)</div>
                 <div id="liveTotalDisplay" style="text-align: center; font-weight: bold; font-size: 1.3em;"></div>
                 <div id="liveTotalSubDisplay" style="text-align: center; font-size: 0.85em; opacity: 0.9; margin-top: 5px; border-top: 1px dashed rgba(255,255,255,0.3); padding-top: 5px;"></div>
             </div>
-
-            <button id="addRowBtn" class="btn-secondary" style="margin-top: var(--space-4); width: 100%; justify-content: center; padding: 14px; font-weight: bold; border: 2px dashed var(--accent-300); background: rgba(102, 126, 234, 0.05);">
-                ${t.addRowBtn || '+ पंक्ति जोड़ें'}
-            </button>
         `;
 
         const laggiSelect = document.getElementById('estimatorLaggi');
         for (let i = 4; i <= 12; i += 0.25) {
             const option = document.createElement('option');
             option.value = i;
-            option.textContent = `${i} हाथ`;
+            option.textContent = `${this.formatLaggiValue(i)} हाथ (Hand)`;
             if (i === 5.5) option.selected = true;
             laggiSelect.appendChild(option);
         }
+    }
+
+    updateEstimatorHeader(group) {
+        const header = document.getElementById('estimatorHeader');
+        if (!header) return;
+
+        let fields = [];
+        if (group === 'extended') {
+            fields = ['बीघा', 'कट्ठा', 'धुर', 'धुरकी', 'फुरकी', 'चुरकी'];
+        } else if (group === 'kanma') {
+            fields = ['बीघा', 'कट्ठा', 'धुर', 'कनबा'];
+        } else if (group === 'modern') {
+            fields = ['हेक्टर', 'एकड़', 'डिसमिल'];
+        }
+
+        const cols = fields.length + 1; // +1 for index and remove button
+        header.style.gridTemplateColumns = `40px repeat(${fields.length}, 1fr) 40px`;
+        header.innerHTML = `
+            <div style="font-size: 0.7em; font-weight: bold; color: var(--text-muted); text-align: center;">#</div>
+            ${fields.map(f => `<div style="font-size: 0.7em; font-weight: bold; color: var(--text-muted); text-align: center;">${f}</div>`).join('')}
+            <div></div>
+        `;
     }
 
     addEstimatorRow(index, group) {
@@ -283,92 +434,171 @@ class UIManager {
         const rowDiv = document.createElement('div');
         rowDiv.className = 'estimator-row';
         rowDiv.dataset.index = index;
-        rowDiv.style.padding = 'var(--space-4)';
-        rowDiv.style.background = 'var(--bg-white)';
-        rowDiv.style.borderRadius = 'var(--radius-lg)';
-        rowDiv.style.border = '1px solid var(--accent-100)';
-        rowDiv.style.boxShadow = 'var(--shadow-sm)';
-        rowDiv.style.transition = 'all 0.3s ease';
+        rowDiv.style.display = 'grid';
+        rowDiv.style.alignItems = 'center';
+        rowDiv.style.padding = '10px 15px';
+        rowDiv.style.borderBottom = '1px solid var(--accent-50);';
+        rowDiv.style.background = index % 2 === 0 ? 'var(--bg-white)' : 'rgba(0,0,0,0.01)';
 
         let fields = [];
         if (group === 'extended') {
-            fields = [
-                { label: 'B', key: 'bigha' },
-                { label: 'K', key: 'katha' },
-                { label: 'D', key: 'dhur' },
-                { label: 'Dk', key: 'dhurki' },
-                { label: 'F', key: 'furki' },
-                { label: 'C', key: 'churki' }
-            ];
+            fields = ['bigha', 'katha', 'dhur', 'dhurki', 'furki', 'churki'];
         } else if (group === 'kanma') {
-            fields = [
-                { label: 'B', key: 'bigha' },
-                { label: 'K', key: 'katha' },
-                { label: 'D', key: 'dhur' },
-                { label: 'Km', key: 'kanma' }
-            ];
+            fields = ['bigha', 'katha', 'dhur', 'kanba'];
         } else if (group === 'modern') {
-            fields = [
-                { label: 'Hec', key: 'hectare' },
-                { label: 'Acr', key: 'acre' },
-                { label: 'Dec', key: 'decimal' }
-            ];
+            fields = ['hectare', 'acre', 'decimal'];
         }
 
+        rowDiv.style.gridTemplateColumns = `40px repeat(${fields.length}, 1fr) 40px`;
         rowDiv.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <span style="font-weight: bold; opacity: 0.7;"># ${index + 1}</span>
-                ${index > 0 ? `<button class="remove-row-btn" style="background: none; border: none; color: var(--accent-500); cursor: pointer; font-size: 1.2em;">&times;</button>` : ''}
-            </div>
-            <div class="input-grid" style="grid-template-columns: repeat(auto-fit, minmax(75px, 1fr)); gap: 10px;">
-                ${fields.map(f => `
-                    <div class="input-group">
-                        <label style="font-size: 0.75em; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block; text-align: center;">${f.label}</label>
-                        <input type="number" class="text-input row-input" data-key="${f.key}" placeholder="0" style="padding: 10px 5px; font-size: 1em; text-align: center; border-radius: var(--radius-md); border: 2px solid var(--accent-100);">
-                    </div>
-                `).join('')}
-            </div>
+            <div style="font-weight: bold; opacity: 0.5; font-size: 0.8em; text-align: center;">${index + 1}</div>
+            ${fields.map(f => `
+                <div style="padding: 0 4px;">
+                    <input type="number" class="text-input row-input" data-key="${f}" placeholder="0" 
+                        style="padding: 8px 2px; font-size: 0.95em; text-align: center; border-radius: 4px; border: 1px solid var(--accent-100); width: 100%; box-sizing: border-box;">
+                </div>
+            `).join('')}
+            <button class="remove-row-btn" style="background: none; border: none; color: var(--accent-300); cursor: pointer; font-size: 1.2em; display: flex; justify-content: center; align-items: center;">
+                ${index > 0 ? '&times;' : ''}
+            </button>
         `;
 
         container.appendChild(rowDiv);
+
         rowDiv.style.transform = 'scale(0.95)';
         setTimeout(() => rowDiv.style.transform = 'scale(1)', 10);
 
         const removeBtn = rowDiv.querySelector('.remove-row-btn');
-        if (removeBtn) {
-            removeBtn.addEventListener('click', () => rowDiv.remove());
+        if (removeBtn && index > 0) {
+            removeBtn.addEventListener('click', () => {
+                rowDiv.remove();
+                // We don't need to manually trigger updateLiveTotal here 
+                // as the app.js should handle it if needed via observers or listeners
+            });
         }
+    }
+
+    createTriangleToggle(currentMode) {
+        const isHeron = currentMode === 'heron';
+        return `
+            <div style="display: flex; justify-content: center; margin-bottom: var(--space-8); background: var(--bg-primary); padding: 8px; border-radius: var(--radius-xl); border: 2px solid var(--primary-100); box-shadow: var(--shadow-inner);">
+                <div style="display: flex; background: var(--bg-white); border-radius: var(--radius-lg); padding: 5px; width: 100%; max-width: 450px; gap: 5px;">
+                    <button id="triangleModeBase" class="btn-group-select ${!isHeron ? 'active' : ''}" style="flex: 1; justify-content: center; padding: 12px; font-size: 0.9em; flex-direction: column; gap: 2px;">
+                        <span style="font-size: 1.2em;">🔺</span>
+                        <div style="font-weight: 700;">Base & Height / आधार एवं ऊंचाई</div>
+                    </button>
+                    <button id="triangleModeHeron" class="btn-group-select ${isHeron ? 'active' : ''}" style="flex: 1; justify-content: center; padding: 12px; font-size: 0.9em; flex-direction: column; gap: 2px;">
+                        <span style="font-size: 1.2em;">📐</span>
+                        <div style="font-weight: 700;">Three Sides / तीन भुजाएं</div>
+                    </button>
+                </div>
+            </div>
+        `;
     }
 
     createShapeInputs(shapeType) {
         const shape = shapeFormulas[shapeType];
         if (!shape) return;
 
+        const inputCount = shape.inputs.length;
+        const gridCols = inputCount > 3 ? 'repeat(auto-fit, minmax(80px, 1fr))' : `repeat(${inputCount}, 1fr)`;
+
         const inputsHTML = shape.inputs.map(input => `
-      <div class="input-group">
-        <label class="input-label">
-          <span>📏</span>
-          ${input.name} ${input.unit ? `(${input.unit})` : ''}
-        </label>
-        <input 
-          type="number" 
-          data-key="${input.key}"
-          class="text-input shape-input" 
-          placeholder="मान दर्ज करें"
-          step="0.01"
-          min="0"
-        />
-      </div>
-    `).join('');
+            <div class="input-group" style="animation: slideInUp 0.3s ease-out; margin-bottom: 0;">
+                <label class="input-label" style="font-size: 0.8em; justify-content: center; margin-bottom: 5px;">
+                    <span>${input.name}</span>
+                </label>
+                <div style="position: relative;">
+                    <input 
+                        type="number" 
+                        data-key="${input.key}"
+                        class="text-input shape-input" 
+                        placeholder="0"
+                        step="0.01"
+                        min="0"
+                        style="padding-right: 45px; text-align: center; font-weight: 700; font-size: 1.1em; height: 50px;"
+                    />
+                    <span class="shape-unit-suffix" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 0.75em; font-weight: 600; color: var(--primary-400); pointer-events: none;">फीट</span>
+                </div>
+            </div>
+        `).join('');
+
+        let toggleHTML = '';
+        if (shapeType === 'triangle' || shapeType === 'heron') {
+            toggleHTML = this.createTriangleToggle(shapeType);
+        }
 
         this.elements.inputContainer.innerHTML = `
-      <div class="input-grid">
-        ${inputsHTML}
-      </div>
-      <div style="padding: var(--space-4); background: rgba(102, 126, 234, 0.1); border-radius: var(--radius-sm); margin-top: var(--space-4); color: var(--text-secondary);">
-        <strong>सूत्र:</strong> ${shape.formula}
-      </div>
-    `;
+            ${toggleHTML}
+            
+            <div class="calc-section" style="margin-bottom: var(--space-6);">
+                <label class="section-label" style="justify-content: center;">
+                    <span class="label-icon">📏</span>
+                    मापन की इकाई (Input Unit)
+                </label>
+                <select id="shapeGlobalUnit" class="select-input" style="font-weight: 700; text-align: center; height: 50px; font-size: 1.05em; border: 2px solid var(--primary-100);">
+                    ${Object.keys(lengthUnits).map(u => `<option value="${u}" ${u === 'फीट' ? 'selected' : ''}>${unitDisplayNames[u] || u}</option>`).join('')}
+                </select>
+            </div>
+
+            <div class="input-grid" style="grid-template-columns: ${gridCols}; gap: 10px; background: var(--bg-primary); padding: 15px; border-radius: var(--radius-lg); border: 1px dashed var(--primary-200);">
+                ${inputsHTML}
+            </div>
+
+            <div id="liveShapeResult" style="margin-top: 15px; padding: 15px; background: rgba(102, 126, 234, 0.08); border-radius: var(--radius-lg); border: 2px solid var(--primary-100); display: none; text-align: center; animation: slideInUp 0.3s ease-out;">
+                <div style="font-size: 0.75em; color: var(--primary-600); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Live Result / लाइव परिणाम</div>
+                <div id="liveShapeAreaDisplay" style="font-size: 1.4em; font-weight: 900; color: var(--primary-700); line-height: 1.2;"></div>
+            </div>
+            
+            <!-- Bilingual Laggi Selector -->
+            <div class="calc-section" style="margin-top: var(--space-8); padding-top: var(--space-6); border-top: 2px solid var(--bg-primary);">
+                <label class="section-label" style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="label-icon">📏</span>
+                        Laggi Size / लग्गी का माप
+                    </div>
+                    <small style="font-weight: normal; color: var(--text-muted); padding-left: 36px;">
+                        (Required for Bigha/Kattha conversion)
+                    </small>
+                </label>
+                <select id="shapeLaggiHands" class="select-input" style="font-weight: 700; color: var(--primary-700);"></select>
+            </div>
+
+            <div style="padding: var(--space-4); background: linear-gradient(to right, rgba(102, 126, 234, 0.1), transparent); border-left: 4px solid var(--primary-300); border-radius: var(--radius-sm); margin-top: var(--space-6); color: var(--text-secondary); font-size: 0.9em;">
+                <strong style="color: var(--primary-600);">Formula / सूत्र:</strong> ${shape.formula}
+            </div>
+        `;
+
+        const laggiSelect = document.getElementById('shapeLaggiHands');
+        if (laggiSelect) {
+            for (let i = 4; i <= 12; i += 0.25) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `${this.formatLaggiValue(i)} Hands / हाथ`;
+                if (i === 5.5) option.selected = true;
+                laggiSelect.appendChild(option);
+            }
+        }
+    }
+
+    updateShapeUnitDisplay(unit) {
+        const suffixes = document.querySelectorAll('.shape-unit-suffix');
+        suffixes.forEach(s => {
+            s.textContent = unit;
+        });
+    }
+
+    updateLiveShapeArea(area, unit) {
+        const container = document.getElementById('liveShapeResult');
+        const display = document.getElementById('liveShapeAreaDisplay');
+        if (!container || !display) return;
+
+        if (area > 0) {
+            container.style.display = 'block';
+            display.innerHTML = `${area.toFixed(2)} <small style="font-size: 0.6em; opacity: 0.8;">वर्ग ${unit} (Sq. ${unit})</small>`;
+        } else {
+            container.style.display = 'none';
+        }
     }
 
     createLaggiInputs() {
@@ -429,6 +659,11 @@ class UIManager {
         this.elements.calculateBtnContainer.classList.add('hidden');
     }
 
+    getLaggiValueForShape() {
+        const laggiSelect = document.getElementById('shapeLaggiHands');
+        return laggiSelect ? parseFloat(laggiSelect.value) : 5.5;
+    }
+
     clearAll() {
         this.elements.inputContainer.innerHTML = '';
         this.elements.resultArea.innerHTML = '';
@@ -442,7 +677,7 @@ class UIManager {
         if (settings.unitPrecisions && settings.unitPrecisions[unit] !== undefined) {
             return settings.unitPrecisions[unit];
         }
-        const traditionalUnits = ["धुर", "कट्ठा", "बीघा", "कनमा", "धुरकी", "फुरकी", "चुरकी"];
+        const traditionalUnits = ["धुर", "कट्ठा", "बीघा", "कनबा", "धुरकी", "फुरकी", "चुरकी"];
         if (traditionalUnits.includes(unit)) return settings.tradPrecision || 4;
         return settings.stdPrecision || 4;
     }
@@ -478,7 +713,7 @@ class UIManager {
         let html = `
             <div style="background: var(--gradient-primary); color: white; padding: 15px; text-align: center; border-radius: var(--radius-md) var(--radius-md) 0 0; margin-bottom: 0;">
                 <h3 style="margin:0; font-size: 1.2em;">📊 भूमि विवरण रिपोर्ट (Detailed Report)</h3>
-                <small style="opacity: 0.9;">लग्गी का मान: ${laggiHands} हाथ</small>
+                <small style="opacity: 0.9;">लग्गी का मान: ${this.formatLaggiValue(laggiHands)} हाथ</small>
             </div>
             
             <div style="background: var(--bg-white); border: 2px solid var(--accent-500); padding: 15px; margin-bottom: var(--space-4); border-radius: 0 0 var(--radius-md) var(--radius-md); box-shadow: var(--shadow-md);">
@@ -487,7 +722,7 @@ class UIManager {
                     <div style="font-size: 1.5em; font-weight: bold; color: var(--accent-600); line-height: 1.4;">
                         ${lb.bigha} बीघा - ${lb.katha} कट्ठा - ${lb.dhur} धुर
                         <div style="font-size: 0.7em; color: var(--text-primary); margin-top: 5px;">
-                            ${lb.dhurki} धुर्की ${lb.furki} फुर्की ${lb.churki} चुरकी
+                            ${lb.dhurki} धुरकी ${lb.furki} फुरकी ${lb.churki} चुरकी
                         </div>
                     </div>
                 </div>
@@ -495,7 +730,7 @@ class UIManager {
                 <div style="text-align: center; padding-top: 15px; border-top: 1px dashed #ddd;">
                     <span style="color: var(--text-muted); font-size: 0.9em; display: block; margin-bottom: 5px;">कुल रकबा (आधुनिक):</span>
                     <div style="font-size: 1.5em; font-weight: bold; color: #2f855a; line-height: 1.4;">
-                        ${sb.hectare} हेक्टेयर - ${sb.acre} एकड़ - ${sb.decimal} डिसमिल
+                        ${sb.hectare} हेक्टर - ${sb.acre} एकड़ - ${sb.decimal} डिसमिल
                     </div>
                 </div>
             </div>
@@ -510,16 +745,16 @@ class UIManager {
         let unitsToShow = [];
         if (targetUnit === 'all') {
             unitsToShow = [
-                "बीघा", "कट्ठा", "धुर", "धुर्की", "कनमा", "फुरकी", "चुरकी",
-                "डिसमिल", "एकड़", "हेक्टेयर",
-                "वर्ग फीट", "वर्ग मीटर", "वर्ग गज", "वर्ग इंच", "वर्ग कड़ी", "वर्ग हाथ"
+                "बीघा", "कट्ठा", "धुर", "धुरकी", "कनबा", "फुरकी", "चुरकी",
+                "डिसमिल", "एकड़", "हेक्टर",
+                "वर्ग फीट", "वर्ग मीटर", "वर्ग गज", "वर्ग इंच", "वर्ग कड़ी", "वर्ग हाथ"
             ];
         } else if (targetUnit === 'extended') {
-            unitsToShow = ["बीघा", "कट्ठा", "धुर", "धुर्की", "फुरकी", "चुरकी"];
+            unitsToShow = ["बीघा", "कट्ठा", "धुर", "धुरकी", "फुरकी", "चुरकी"];
         } else if (targetUnit === 'kanma') {
-            unitsToShow = ["बीघा", "कट्ठा", "धुर", "कनमा"];
+            unitsToShow = ["बीघा", "कट्ठा", "धुर", "कनबा"];
         } else if (targetUnit === 'modern') {
-            unitsToShow = ["हेक्टेयर", "एकड़", "डिसमिल", "वर्ग फीट", "वर्ग मीटर"];
+            unitsToShow = ["हेक्टर", "एकड़", "डिसमिल", "वर्ग फीट", "वर्ग मीटर"];
         }
 
         unitsToShow.forEach(unit => {
@@ -539,42 +774,112 @@ class UIManager {
         this.elements.resultArea.innerHTML = html;
     }
 
-    displayShapeResult(shapeType, area, settings) {
+    displayShapeResult(shapeType, area, settings, laggiHands = 5.5) {
         const shape = shapeFormulas[shapeType];
-        const p_feet = this.getPrecision('वर्ग फीट', settings);
+        const selectedUnit = document.getElementById('shapeGlobalUnit')?.value || 'फीट';
+
+        // Dynamic area units based on Laggi
+        const dynamicUnits = getDynamicAreaUnits(laggiHands);
+        const totalDhur = area / dynamicUnits["धुर"];
+        const lb = Calculator.getLaggiBreakdown(totalDhur);
+        const sb = Calculator.getStandardBreakdown(area);
+
+        // Calculate area in selected unit
+        // area is in Sq Ft.
+        const unitFactor = lengthUnits[selectedUnit] / 12;
+        const areaInSelectedUnit = area / (unitFactor * unitFactor);
 
         let html = `
-      <div style="margin-bottom: var(--space-6);">
-        <div style="font-size: var(--font-2xl); margin-bottom: var(--space-3);">
-          ${shape.icon}
-        </div>
-        <strong class="result-highlight">${shape.name} का क्षेत्रफल:</strong>
-      </div>
-      <div style="margin-bottom: var(--space-4);">
-        <div class="result-item" style="font-size: var(--font-lg); border-left-width: 6px;">
-          <span>📊</span>
-          <strong>${area.toFixed(p_feet)} वर्ग फीट</strong>
-        </div>
-      </div>
-      <div style="margin-top: var(--space-6); padding-top: var(--space-6); border-top: 2px solid rgba(102, 126, 234, 0.2);">
-        <strong style="display: block; margin-bottom: var(--space-3);">अन्य इकाइयों में:</strong>
-    `;
+            <div style="background: var(--gradient-primary); color: white; padding: 25px 20px; text-align: center; border-radius: var(--radius-lg) var(--radius-lg) 0 0; margin-bottom: 0; box-shadow: var(--shadow-lg);">
+                <div style="font-size: 2.8em; margin-bottom: 12px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));">${shape.icon}</div>
+                <h3 style="margin:0; font-size: 1.5em; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;">
+                    ${shape.name} Area
+                </h3>
+                <div style="font-size: 1.1em; opacity: 0.9; margin-top: 5px;">${shape.name} का क्षेत्रफल</div>
+                
+                <div style="margin-top: 15px; background: rgba(255,255,255,0.15); padding: 12px; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.3); display: flex; flex-direction: column; gap: 4px;">
+                    <div style="font-size: 1.8em; font-weight: 900; letter-spacing: 1px;">
+                        ${areaInSelectedUnit.toFixed(2)} <span style="font-size: 0.6em; font-weight: 600;">Sq. ${selectedUnit}</span>
+                    </div>
+                    <div style="font-size: 0.9em; opacity: 0.8; font-weight: 600;">
+                        ${areaInSelectedUnit.toFixed(2)} वर्ग ${selectedUnit}
+                    </div>
+                </div>
 
-        const dynamicUnits = getDynamicAreaUnits(5.5);
+                <div style="margin-top: 12px; font-size: 0.85em; background: rgba(0,0,0,0.2); display: inline-block; padding: 5px 15px; border-radius: var(--radius-full); font-weight: 600;">
+                    Laggi / लग्गी: ${this.formatLaggiValue(laggiHands)} हाथ
+                </div>
+            </div>
+            
+            <div style="background: var(--bg-white); border: 2px solid var(--primary-100); padding: 25px; margin-bottom: var(--space-6); border-radius: 0 0 var(--radius-lg) var(--radius-lg); box-shadow: var(--shadow-xl);">
+                <!-- Traditional Section -->
+                <div style="text-align: center; margin-bottom: 30px; position: relative;">
+                    <span style="color: var(--primary-600); font-weight: 600; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 12px;">
+                        Traditional Area / पारंपरिक रकबा
+                    </span>
+                    <div style="padding: 15px; background: var(--bg-primary); border-radius: var(--radius-md); border: 1px solid var(--primary-100);">
+                        <div style="font-size: 1.8em; font-weight: 900; color: var(--primary-700); line-height: 1.2;">
+                            ${lb.bigha} <small style="font-size: 0.5em;">Bigha</small> - ${lb.katha} <small style="font-size: 0.5em;">Kattha</small> - ${lb.dhur} <small style="font-size: 0.5em;">Dhur</small>
+                        </div>
+                        <div style="font-size: 0.9em; color: var(--text-secondary); margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px;">
+                            ${lb.dhurki} Dhurki, ${lb.furki} Furki, ${lb.churki} Churki
+                        </div>
+                    </div>
+                </div>
 
-        for (let unit in dynamicUnits) {
+                <!-- Modern Section -->
+                <div style="text-align: center; padding-top: 20px; border-top: 2px dashed var(--primary-100);">
+                    <span style="color: #2f855a; font-weight: 600; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 12px;">
+                        Modern Area / आधुनिक रकबा
+                    </span>
+                    <div style="padding: 15px; background: #f0fff4; border-radius: var(--radius-md); border: 1px solid #c6f6d5;">
+                        <div style="font-size: 1.6em; font-weight: 800; color: #276749; line-height: 1.2;">
+                            ${sb.hectare} <small style="font-size: 0.5em;">Hec</small> - ${sb.acre} <small style="font-size: 0.5em;">Acre</small> - ${sb.decimal} <small style="font-size: 0.5em;">Dec</small>
+                        </div>
+                        <div style="font-size: 1em; color: #2f855a; font-weight: 600; margin-top: 10px;">
+                            Total: ${area.toFixed(this.getPrecision('वर्ग फीट', settings))} Sq. Ft.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 10px;">
+                <span style="background: var(--gradient-primary); width: 4px; height: 20px; border-radius: 2px;"></span>
+                All Units / सभी इकाइयाँ
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;">
+        `;
+
+        const unitsToShow = [
+            "बीघा", "कट्ठा", "धुर", "धुरकी", "कनबा", "डिसमिल", "एकड़", "हेक्टर",
+            "वर्ग फीट", "वर्ग मीटर", "वर्ग गज", "वर्ग कड़ी"
+        ];
+
+        unitsToShow.forEach(unit => {
+            if (!dynamicUnits[unit]) return;
             const converted = area / dynamicUnits[unit];
             const p = this.getPrecision(unit, settings);
+
+            // Map common units to English for bilingual display
+            const unitEngMap = {
+                "बीघा": "Bigha", "कट्ठा": "Kattha", "धुर": "Dhur", "धुरकी": "Dhurki",
+                "कनबा": "Kanba", "डिसमिल": "Decimal", "एकड़": "Acre", "हेक्टर": "Hectare",
+                "वर्ग फीट": "Sq. Ft.", "वर्ग मीटर": "Sq. Mt.", "वर्ग गज": "Sq. Yard", "वर्ग कड़ी": "Sq. Chain"
+            };
+
             html += `
-        <div class="result-item">
-          <span>•</span>
-          <span>${converted.toFixed(p)} ${unit}</span>
-        </div>
-      `;
-        }
+                <div class="result-item" style="padding: 12px; border-radius: var(--radius-md); background: var(--bg-white); border: 1px solid var(--primary-100); box-shadow: var(--shadow-sm); transition: transform 0.2s;">
+                    <div style="font-size: 0.7em; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">${unitEngMap[unit] || unit}</div>
+                    <div style="font-size: 1.1em; font-weight: 700; color: var(--text-primary); margin: 2px 0;">${converted.toFixed(p)}</div>
+                    <div style="font-size: 0.65em; color: var(--text-light);">${unit}</div>
+                </div>
+            `;
+        });
 
         html += `</div>`;
         this.elements.resultArea.innerHTML = html;
+        this.elements.resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     displayLaggiResult(results, settings) {
@@ -652,7 +957,7 @@ class UIManager {
             <div style="margin-top: var(--space-6); padding: var(--space-4); background: var(--gradient-primary); color: white; border-radius: var(--radius-md); text-align: center;">
                 <h4 style="margin-bottom: var(--space-2); color: white; opacity: 0.9;">कुल पारंपरिक ब्रेकडाउन:</h4>
                 <div style="font-size: 1.25em; font-weight: bold;">
-                    ${lb.bigha} बीघा ${lb.katha} कट्ठा ${lb.dhur} धुर ${lb.dhurki} धुर्की ${lb.furki} फुर्की ${lb.churki} चुरकी
+                    ${lb.bigha} बीघा ${lb.katha} कट्ठा ${lb.dhur} धुर ${lb.dhurki} धुरकी ${lb.furki} फुरकी ${lb.churki} चुरकी
                 </div>
             </div>
         `;
