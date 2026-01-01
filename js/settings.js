@@ -12,9 +12,9 @@ class SettingsManager {
         try {
             this.settings = JSON.parse(localStorage.getItem('calculatorSettings')) || {
                 lang: 'hi',
-                theme: 'default',
+                theme: 'clean',
                 font: 'var(--font-primary)',
-                accentColor: '#667eea',
+                accentColor: '#3b82f6',
                 tradPrecision: 4,
                 stdPrecision: 4,
                 defaultCalc: 'none',
@@ -26,9 +26,9 @@ class SettingsManager {
         } catch (e) {
             this.settings = {
                 lang: 'hi',
-                theme: 'default',
+                theme: 'clean',
                 font: 'var(--font-primary)',
-                accentColor: '#667eea',
+                accentColor: '#3b82f6',
                 tradPrecision: 4,
                 stdPrecision: 4,
                 defaultCalc: 'none',
@@ -105,6 +105,15 @@ class SettingsManager {
         if (elements.settingsBtn) elements.settingsBtn.onclick = () => elements.settingsModal.classList.remove('hidden');
         if (elements.closeSettings) elements.closeSettings.onclick = () => elements.settingsModal.classList.add('hidden');
 
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        if (themeToggleBtn) {
+            themeToggleBtn.onclick = () => {
+                const currentTheme = this.settings.theme;
+                const nextTheme = (currentTheme === 'dark' ? 'clean' : 'dark');
+                this.applyTheme(nextTheme);
+            };
+        }
+
         window.onclick = (e) => {
             if (e.target === elements.settingsModal) elements.settingsModal.classList.add('hidden');
         };
@@ -153,8 +162,30 @@ class SettingsManager {
 
     applySettings() {
         document.body.style.fontFamily = this.settings.font;
-        document.documentElement.style.setProperty('--primary-500', this.settings.accentColor);
-        document.documentElement.style.setProperty('--gradient-primary', `linear-gradient(135deg, ${this.settings.accentColor} 0%, ${this.settings.accentColor}dd 100%)`);
+        const theme = themes[this.settings.theme] || themes.default;
+
+        // Use user's selected accent color if it was custom, otherwise use theme primary
+        const primary = this.settings.accentColor || theme.primary;
+
+        document.documentElement.style.setProperty('--primary-500', primary);
+        document.documentElement.style.setProperty('--gradient-primary', `linear-gradient(135deg, ${primary} 0%, ${primary}dd 100%)`);
+
+        // Apply theme-specific variables if not overridden
+        if (theme.bg) document.documentElement.style.setProperty('--bg-main', theme.bg);
+        if (theme.card) document.documentElement.style.setProperty('--bg-card', theme.card);
+        if (theme.text) document.documentElement.style.setProperty('--text-primary', theme.text);
+        if (theme.secondary) document.documentElement.style.setProperty('--gradient-secondary', `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 100%)`);
+
+        // Handle background white replacement for dark/clean themes
+        const bgWhite = theme.bgWhite || (this.settings.theme === 'dark' ? '#1e293b' : '#ffffff');
+        document.documentElement.style.setProperty('--bg-white', bgWhite);
+
+        // Toggle animations based on theme distraction level
+        if (this.settings.theme === 'clean' || this.settings.theme === 'dark') {
+            document.body.classList.add('no-animation');
+        } else {
+            document.body.classList.remove('no-animation');
+        }
 
         const langHi = document.getElementById('langHi');
         const langEn = document.getElementById('langEn');
@@ -165,7 +196,6 @@ class SettingsManager {
         const defaultCalc = document.getElementById('defaultCalcSelect');
 
         if (langHi) langHi.checked = this.settings.lang === 'hi';
-        if (langEn) langEn.checked = this.settings.lang === 'en';
         if (fontSelect) fontSelect.value = this.settings.font;
         if (colorPicker) colorPicker.value = this.settings.accentColor;
         if (tradPrecision) tradPrecision.value = this.settings.tradPrecision || 4;
@@ -182,7 +212,10 @@ class SettingsManager {
     applyTheme(themeKey) {
         const theme = themes[themeKey];
         if (theme) {
-            this.updateSetting('accentColor', theme.primary);
+            this.settings.theme = themeKey;
+            this.settings.accentColor = theme.primary; // Sync accent color with theme
+            this.save();
+            this.applySettings();
         }
     }
 

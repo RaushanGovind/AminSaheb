@@ -284,7 +284,7 @@ class UIManager {
         rowDiv.className = 'estimator-row';
         rowDiv.dataset.index = index;
         rowDiv.style.padding = 'var(--space-4)';
-        rowDiv.style.background = 'white';
+        rowDiv.style.background = 'var(--bg-white)';
         rowDiv.style.borderRadius = 'var(--radius-lg)';
         rowDiv.style.border = '1px solid var(--accent-100)';
         rowDiv.style.boxShadow = 'var(--shadow-sm)';
@@ -481,7 +481,7 @@ class UIManager {
                 <small style="opacity: 0.9;">लग्गी का मान: ${laggiHands} हाथ</small>
             </div>
             
-            <div style="background: white; border: 2px solid var(--accent-500); padding: 15px; margin-bottom: var(--space-4); border-radius: 0 0 var(--radius-md) var(--radius-md); box-shadow: var(--shadow-md);">
+            <div style="background: var(--bg-white); border: 2px solid var(--accent-500); padding: 15px; margin-bottom: var(--space-4); border-radius: 0 0 var(--radius-md) var(--radius-md); box-shadow: var(--shadow-md);">
                 <div style="text-align: center; margin-bottom: 20px;">
                     <span style="color: var(--text-muted); font-size: 0.9em; display: block; margin-bottom: 5px;">कुल रकबा (पारंपरिक):</span>
                     <div style="font-size: 1.5em; font-weight: bold; color: var(--accent-600); line-height: 1.4;">
@@ -528,7 +528,7 @@ class UIManager {
             const p = this.getPrecision(unit, settings);
 
             html += `
-                <div class="result-item" style="padding: 10px; flex-direction: column; align-items: flex-start; gap: 2px; border-left: 4px solid var(--accent-400); background: white;">
+                <div class="result-item" style="padding: 10px; flex-direction: column; align-items: flex-start; gap: 2px; border-left: 4px solid var(--accent-400); background: var(--bg-white);">
                     <span style="font-size: 0.75em; color: var(--text-muted);">${unit}</span>
                     <strong style="font-size: 1.1em;">${converted.toFixed(p)}</strong>
                 </div>
@@ -680,7 +680,7 @@ class UIManager {
         ` : '';
 
         this.elements.resultArea.innerHTML = `
-            <div style="background: white; border: 2px solid ${isValid ? '#48bb78' : '#f56565'}; padding: 20px; border-radius: var(--radius-md); box-shadow: var(--shadow-md);">
+            <div style="background: var(--bg-white); border: 2px solid ${isValid ? '#48bb78' : '#f56565'}; padding: 20px; border-radius: var(--radius-md); box-shadow: var(--shadow-md);">
                 <div style="text-align: center; margin-bottom: 20px;">
                     <div style="font-size: 2.5em; margin-bottom: 10px;">${isValid ? '✅' : '❌'}</div>
                     <h3 style="margin: 0; color: ${isValid ? '#2f855a' : '#c53030'};">${statusText}</h3>

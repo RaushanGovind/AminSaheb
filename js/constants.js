@@ -166,11 +166,54 @@ const translations = {
 };
 
 const themes = {
-    default: { primary: "#667eea", secondary: "#764ba2" },
-    sunset: { primary: "#f093fb", secondary: "#f5576c" },
-    ocean: { primary: "#4facfe", secondary: "#00f2fe" },
-    forest: { primary: "#52fa5a", secondary: "#4facfe" },
-    royal: { primary: "#30cfd0", secondary: "#330867" }
+    default: {
+        name: "Classic",
+        primary: "#667eea",
+        secondary: "#764ba2",
+        bg: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        card: "rgba(255, 255, 255, 0.98)",
+        text: "#1a202c"
+    },
+    clean: {
+        name: "Professional",
+        primary: "#3b82f6",
+        secondary: "#1e40af",
+        bg: "#f8fafc",
+        card: "#ffffff",
+        text: "#0f172a"
+    },
+    dark: {
+        name: "Dark Modern",
+        primary: "#6366f1",
+        secondary: "#4338ca",
+        bg: "#0f172a",
+        card: "#1e293b",
+        text: "#f8fafc"
+    },
+    sunset: {
+        name: "Sunset",
+        primary: "#f093fb",
+        secondary: "#f5576c",
+        bg: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+        card: "rgba(255, 255, 255, 0.95)",
+        text: "#1a202c"
+    },
+    ocean: {
+        name: "Ocean",
+        primary: "#4facfe",
+        secondary: "#00f2fe",
+        bg: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+        card: "rgba(255, 255, 255, 0.95)",
+        text: "#0f4c75"
+    },
+    forest: {
+        name: "Forest",
+        primary: "#10b981",
+        secondary: "#059669",
+        bg: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+        card: "rgba(255, 255, 255, 0.95)",
+        text: "#064e3b"
+    }
 };
 
 const shapeFormulas = {

@@ -145,13 +145,20 @@
   --breakpoint-xl: 1280px;
 }
 
-/* Dark Mode Support (Optional) */
+/* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
   :root {
-    --text-primary: #f7fafc;
+    --text-primary: #ffffff;
     --text-secondary: #e2e8f0;
-    --text-muted: #cbd5e0;
-    --bg-card: rgba(26, 32, 44, 0.95);
-    --bg-glass: rgba(26, 32, 44, 0.85);
+    --text-muted: #a0aec0;
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-white: #1e293b;
+    --bg-card: rgba(30, 41, 59, 0.95);
+    --bg-glass: rgba(15, 23, 42, 0.8);
+    --bg-glass-dark: rgba(255, 255, 255, 0.05);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.6);
   }
 }

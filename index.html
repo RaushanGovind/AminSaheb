@@ -54,7 +54,11 @@
       </div>
       <p id="mainTagline" class="tagline">सटीक गणना, आसान तरीका</p>
     </div>
-    <button id="settingsBtn" class="settings-trigger" title="Settings"><span class="settings-icon">⚙️</span></button>
+    <div class="header-actions">
+      <button id="themeToggleBtn" class="settings-trigger" title="Toggle Theme"><span
+          class="theme-icon">🌓</span></button>
+      <button id="settingsBtn" class="settings-trigger" title="Settings"><span class="settings-icon">⚙️</span></button>
+    </div>
   </header>
 
   <!-- Settings Modal (Internalizing structure for speed) -->
@@ -73,11 +77,16 @@
         </div>
         <div class="setting-group"><label id="themeLabel" class="setting-label">थीम (Theme)</label>
           <div class="theme-grid">
-            <button class="theme-option" data-theme="default" style="background:var(--gradient-primary)"></button>
-            <button class="theme-option" data-theme="sunset" style="background:var(--gradient-secondary)"></button>
-            <button class="theme-option" data-theme="ocean" style="background:var(--gradient-success)"></button>
-            <button class="theme-option" data-theme="forest" style="background:var(--gradient-green)"></button>
-            <button class="theme-option" data-theme="royal" style="background:var(--gradient-blue)"></button>
+            <button class="theme-option" data-theme="default" title="Classic"
+              style="background:var(--gradient-primary)"></button>
+            <button class="theme-option" data-theme="clean" title="Professional" style="background:#3b82f6"></button>
+            <button class="theme-option" data-theme="dark" title="Dark Modern" style="background:#1e293b"></button>
+            <button class="theme-option" data-theme="sunset" title="Sunset"
+              style="background:var(--gradient-secondary)"></button>
+            <button class="theme-option" data-theme="ocean" title="Ocean"
+              style="background:var(--gradient-success)"></button>
+            <button class="theme-option" data-theme="forest" title="Forest"
+              style="background:var(--gradient-green)"></button>
           </div>
         </div>
         <div class="setting-group"><label id="fontLabel" class="setting-label">फ़ॉन्ट स्टाइल (Font Style)</label>
