@@ -23,18 +23,18 @@ const landMicroUnits = {
 };
 
 const calculatorTitles = {
-    basic: "🔢 Basic Calculator",
-    length: "📏 Length Calculator",
-    area: "📐 Area Calculator",
-    triangle: "🔺 Triangle Area Calculator",
-    square: "🟦 Square Area Calculator",
-    rectangle: "▭ Rectangle Area Calculator",
-    laggi: "📐 Laggi Land Measurement",
-    landConverter: "🔄 Land Unit Converter",
-    specialArea: "🗺️ Special Area Converter",
-    landEstimator: "🏗️ Land Area Estimator",
-    laggiFinder: "🔍 Laggi Discovery (लग्गी पहचान)",
-    heron: "📐 Heron's Formula Calculator"
+    basic: "Basic Calculator",
+    length: "Length Calculator",
+    area: "Area Calculator",
+    triangle: "Triangle Area Calculator",
+    square: "Square Area Calculator",
+    rectangle: "Rectangle Area Calculator",
+    laggi: "Laggi Land Measurement",
+    landConverter: "Land Unit Converter",
+    specialArea: "Special Area Converter",
+    landEstimator: "Land Area Estimator",
+    laggiFinder: "Laggi Discovery (लग्गी पहचान)",
+    heron: "Heron's Formula Calculator"
 };
 
 const calculatorCards = [

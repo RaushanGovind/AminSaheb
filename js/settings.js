@@ -176,9 +176,14 @@ class SettingsManager {
         if (theme.text) document.documentElement.style.setProperty('--text-primary', theme.text);
         if (theme.secondary) document.documentElement.style.setProperty('--gradient-secondary', `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 100%)`);
 
-        // Handle background white replacement for dark/clean themes
-        const bgWhite = theme.bgWhite || (this.settings.theme === 'dark' ? '#1e293b' : '#ffffff');
-        document.documentElement.style.setProperty('--bg-white', bgWhite);
+        // Handle background white replacement - Use theme's specific bgWhite or default context
+        if (theme.bgWhite) {
+            document.documentElement.style.setProperty('--bg-white', theme.bgWhite);
+        } else if (this.settings.theme === 'dark') {
+            document.documentElement.style.setProperty('--bg-white', '#1e293b');
+        } else {
+            document.documentElement.style.removeProperty('--bg-white');
+        }
 
         // Toggle animations based on theme distraction level
         if (this.settings.theme === 'clean' || this.settings.theme === 'dark') {

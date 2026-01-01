@@ -42,10 +42,14 @@
 }
 
 .header-logo-img {
-    height: 60px;
+    height: 50px;
     width: auto;
     animation: float 3s ease-in-out infinite;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+    border-radius: var(--radius-sm);
+    background: white;
+    /* Ensure white background if image is transparent, but here it has one anyway */
+    padding: 2px;
 }
 
 .logo-text {
@@ -69,11 +73,11 @@
 
 .header-actions {
     position: absolute;
-    top: 50%;
-    right: var(--space-6);
-    transform: translateY(-50%);
+    top: var(--space-4);
+    right: var(--space-4);
     display: flex;
-    gap: var(--space-2);
+    gap: var(--space-3);
+    z-index: 10;
 }
 
 .settings-trigger {
@@ -772,13 +776,17 @@
 }
 
 .calc-title {
-    font-size: var(--font-2xl);
+    font-size: clamp(1.2rem, 4vw, 2rem);
     background: var(--gradient-primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin: 0;
     font-weight: var(--font-extrabold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
 /* ==================== BASIC CALCULATOR ==================== */
@@ -864,11 +872,11 @@
 
 /* Number buttons */
 .btn-number {
-    background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+    background: var(--bg-white);
 }
 
 .btn-number:hover {
-    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    background: var(--bg-secondary);
 }
 
 /* Operator buttons */
@@ -1027,30 +1035,7 @@
 }
 
 /* ==================== SETTINGS MODAL ==================== */
-.settings-trigger {
-    position: absolute;
-    top: var(--space-4);
-    right: var(--space-4);
-    background: var(--bg-card);
-    border: 2px solid rgba(102, 126, 234, 0.2);
-    width: 45px;
-    height: 45px;
-    border-radius: var(--radius-full);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all var(--transition-bounce);
-    box-shadow: var(--shadow-sm);
-    z-index: var(--z-sticky);
-}
-
-.settings-trigger:hover {
-    transform: rotate(90deg) scale(1.1);
-    box-shadow: var(--shadow-md);
-    border-color: var(--primary-500);
-}
-
+/* Removed redundant trigger class */
 .settings-icon {
     font-size: var(--font-2xl);
 }
