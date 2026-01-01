@@ -1,0 +1,196 @@
+/* 🎨 Base Styles & Reset */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--font-primary);
+    background: var(--bg-main);
+    background-size: 200% 200%;
+    animation: gradientShift 15s ease infinite;
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: var(--text-primary);
+    line-height: var(--leading-normal);
+    padding: var(--space-4);
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Animated background gradient */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Add subtle pattern overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: var(--font-bold);
+    line-height: var(--leading-tight);
+    margin-bottom: var(--space-4);
+}
+
+h1 {
+    font-size: var(--font-3xl);
+}
+
+h2 {
+    font-size: var(--font-2xl);
+}
+
+h3 {
+    font-size: var(--font-xl);
+}
+
+h4 {
+    font-size: var(--font-lg);
+}
+
+p {
+    margin-bottom: var(--space-3);
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
+/* Layout */
+.main-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--space-6) 0;
+    position: relative;
+    z-index: 1;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Selection styling */
+::selection {
+    background: var(--primary-500);
+    color: var(--text-white);
+}
+
+::-moz-selection {
+    background: var(--primary-500);
+    color: var(--text-white);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gradient-primary);
+    border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gradient-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    html {
+        font-size: 15px;
+    }
+
+    body {
+        padding: var(--space-3);
+    }
+
+    .main-container {
+        padding: var(--space-4) 0;
+    }
+}
+
+@media (max-width: 480px) {
+    html {
+        font-size: 14px;
+    }
+
+    body {
+        padding: var(--space-2);
+    }
+
+    .main-container {
+        padding: var(--space-3) 0;
+    }
+}
+
+/* Focus styles for accessibility */
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid var(--primary-500);
+    outline-offset: 2px;
+}
+
+/* Smooth transitions for interactive elements */
+a,
+button,
+input,
+select {
+    transition: all var(--transition-base);
+}

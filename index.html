@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>अमीन साहेब - Amin Saheb Calculator</title>
+  <meta name="description" content="भारतीय और आधुनिक इकाइयों में लंबाई और क्षेत्रफल कैलकुलेटर" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/lander.css" />
+</head>
+
+<body>
+
+  <!-- Landing Page -->
+  <div id="landerPage" class="lander-page">
+    <div class="lander-content">
+      <div class="lander-logo"><img src="assets/logo.png" alt="Amin Saheb Logo" class="main-logo-img"></div>
+      <h1 class="lander-title">अमीन साहेब 2.0</h1>
+      <p class="lander-subtitle">पारंपरिक और आधुनिक भूमि मापन का सबसे सटीक समाधान।</p>
+      <div class="lander-features-grid">
+        <div class="l-feat"><span>📐</span>
+          <p>सटीक लग्गी गणना</p>
+        </div>
+        <div class="l-feat"><span>🔄</span>
+          <p>त्वरित रूपांतरण</p>
+        </div>
+        <div class="l-feat"><span>🏗️</span>
+          <p>भूमि अनुमानक</p>
+        </div>
+        <div class="l-feat"><span>📱</span>
+          <p>सरल इंटरफ़ेस</p>
+        </div>
+      </div>
+      <button id="startBtn" class="btn-calculate"
+        style="max-width:300px; margin:40px auto 0; font-size:1.2em; height:60px;">गणना शुरू करें (Start)</button>
+      <p style="margin-top:20px; font-size:0.85em; opacity:0.7;">© 2026 Smart Calculator | India's #1 Land Utility</p>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header hidden">
+    <div class="header-content">
+      <div class="logo"><img src="assets/logo.png" alt="Logo" class="header-logo-img">
+        <h1 id="mainTitle" class="logo-text">अमीन साहेब</h1>
+      </div>
+      <p id="mainTagline" class="tagline">सटीक गणना, आसान तरीका</p>
+    </div>
+    <button id="settingsBtn" class="settings-trigger" title="Settings"><span class="settings-icon">⚙️</span></button>
+  </header>
+
+  <!-- Settings Modal (Internalizing structure for speed) -->
+  <div id="settingsModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="settingsModalTitle">सेटिंग्स (Settings)</h2>
+        <button id="closeSettings" class="close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-group"><label id="langLabel" class="setting-label">भाषा (Language)</label>
+          <div class="radio-group">
+            <input type="radio" id="langHi" name="language" value="hi" checked><label for="langHi">हिन्दी</label>
+            <input type="radio" id="langEn" name="language" value="en"><label for="langEn">English</label>
+          </div>
+        </div>
+        <div class="setting-group"><label id="themeLabel" class="setting-label">थीम (Theme)</label>
+          <div class="theme-grid">
+            <button class="theme-option" data-theme="default" style="background:var(--gradient-primary)"></button>
+            <button class="theme-option" data-theme="sunset" style="background:var(--gradient-secondary)"></button>
+            <button class="theme-option" data-theme="ocean" style="background:var(--gradient-success)"></button>
+            <button class="theme-option" data-theme="forest" style="background:var(--gradient-green)"></button>
+            <button class="theme-option" data-theme="royal" style="background:var(--gradient-blue)"></button>
+          </div>
+        </div>
+        <div class="setting-group"><label id="fontLabel" class="setting-label">फ़ॉन्ट स्टाइल (Font Style)</label>
+          <select id="fontSelect" class="select-input">
+            <option value="var(--font-primary)">Default (Noto Sans)</option>
+            <option value="'Inter', sans-serif">Modern (Inter)</option>
+            <option value="'Roboto', sans-serif">Classic (Roboto)</option>
+            <option value="'Poppins', sans-serif">Playful (Poppins)</option>
+          </select>
+        </div>
+        <div class="setting-group"><label id="colorLabel" class="setting-label">मुख्य रंग (Accent Color)</label>
+          <input type="color" id="accentColorPicker" class="color-picker" value="#667eea">
+        </div>
+        <div class="setting-group"><label id="defaultCalcLabel" class="setting-label">डिफ़ॉल्ट कैलकुलेटर</label>
+          <select id="defaultCalcSelect" class="select-input">
+            <option value="none">Home Screen</option>
+            <option value="basic">Basic Calculator</option>
+            <option value="length">Length Calculator</option>
+            <option value="area">Area Calculator</option>
+            <option value="landConverter">Land Unit Converter</option>
+            <option value="specialArea">Special Area Converter</option>
+            <option value="landEstimator">Land Area Estimator</option>
+            <option value="laggiFinder">Laggi Discovery</option>
+          </select>
+        </div>
+        <div class="setting-group"><label id="precisionLabel" class="setting-label">दशमलव स्थान (Precision)</label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+            <div><label id="tradPrecisionLabel" style="font-size:0.8em; color:var(--text-muted);">पारंपरिक</label>
+              <select id="tradPrecision" class="select-input">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4" selected>4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+            <div><label id="stdPrecisionLabel" style="font-size:0.8em; color:var(--text-muted);">मानक</label>
+              <select id="stdPrecision" class="select-input">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4" selected>4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+          </div>
+          <details
+            style="background:rgba(102,126,234,0.05); border-radius:8px; padding:10px; border:1px solid var(--accent-100);">
+            <summary style="font-size:0.9em; cursor:pointer; color:var(--primary-500); font-weight:600;">इकाई अनुसार
+              राउंडिंग (Unit-wise)</summary>
+            <div id="unitPrecisionGrid"
+              style="display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); gap:10px; margin-top:10px;">
+            </div>
+          </details>
+        </div>
+      </div>
+      <div class="modal-footer"><button id="resetSettings" class="btn-secondary">Reset to Default</button></div>
+    </div>
+  </div>
+
+  <main id="mainApp" class="main-container hidden">
+    <!-- Calculator Selection (Rendered via JS) -->
+    <div id="calculatorSelector" class="calculator-selector">
+      <h2 class="selector-title"><span class="title-icon">🧮</span> अपना कैलकुलेटर चुनें</h2>
+      <div class="calculator-grid"></div>
+    </div>
+
+    <!-- Interface -->
+    <div id="calculatorInterface" class="calculator-card hidden">
+      <button id="backBtn" class="back-btn"><span>←</span><span>वापस जाएं</span></button>
+      <div class="calc-header">
+        <h2 id="calcTitle" class="calc-title"></h2>
+      </div>
+      <div class="selectors-row">
+        <section id="unitSection" class="calc-section hidden"><label for="unitType" class="section-label"><span
+              class="label-icon">📏</span> इकाई चुनें</label><select id="unitType" class="select-input"></select>
+        </section>
+        <section id="laggiSection" class="calc-section hidden"><label for="areaLaggiHands" class="section-label"><span
+              class="label-icon">📐</span> लग्गी हाथ</label><select id="areaLaggiHands" class="select-input"></select>
+        </section>
+      </div>
+      <div id="inputContainer"></div>
+      <div id="basicCalculatorContainer" class="hidden">
+        <div class="calc-display-wrapper">
+          <div id="calcDisplay" class="calc-display-new">
+            <div id="calcExpression" class="calc-expression">0</div>
+            <div id="calcResult" class="calc-result"></div>
+          </div>
+        </div>
+        <div class="calc-buttons">
+          <button class="calc-btn btn-operator" data-action="sqrt">√</button>
+          <button class="calc-btn btn-operator" data-action="sqr">x²</button>
+          <button class="calc-btn btn-clear" data-action="clear">C</button>
+          <button class="calc-btn btn-operator" data-action="delete">⌫</button>
+
+          <button class="calc-btn btn-number" data-action="number" data-value="7">7</button>
+          <button class="calc-btn btn-number" data-action="number" data-value="8">8</button>
+          <button class="calc-btn btn-number" data-action="number" data-value="9">9</button>
+          <button class="calc-btn btn-operator" data-action="operator" data-value="/">÷</button>
+
+          <button class="calc-btn btn-number" data-action="number" data-value="4">4</button>
+          <button class="calc-btn btn-number" data-action="number" data-value="5">5</button>
+          <button class="calc-btn btn-number" data-action="number" data-value="6">6</button>
+          <button class="calc-btn btn-operator" data-action="operator" data-value="*">×</button>
+
+          <button class="calc-btn btn-number" data-action="number" data-value="1">1</button>
+          <button class="calc-btn btn-number" data-action="number" data-value="2">2</button>
+          <button class="calc-btn btn-number" data-action="number" data-value="3">3</button>
+          <button class="calc-btn btn-operator" data-action="operator" data-value="-">−</button>
+
+          <button class="calc-btn btn-number" data-action="number" data-value="0">0</button>
+          <button class="calc-btn btn-number" data-action="number" data-value=".">.</button>
+          <button class="calc-btn btn-equals" data-action="equals">=</button>
+          <button class="calc-btn btn-operator" data-action="operator" data-value="+">+</button>
+        </div>
+      </div>
+      <div id="calculateBtnContainer" class="hidden"><button id="calculateBtn" class="btn-calculate"><span
+            class="btn-icon">✓</span> गणना करें</button></div>
+      <div id="resultArea" class="result-area"></div>
+    </div>
+  </main>
+
+  <footer id="mainFooter" class="footer hidden">
+    <p>© 2026 स्मार्ट कैलकुलेटर | Made with ❤️ in India</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/constants.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/calculator.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/main.js"></script>
+</body>
+
+</html>
