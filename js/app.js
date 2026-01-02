@@ -291,7 +291,8 @@ class SmartCalculatorApp {
     }
 
     setupAreaCalculator() {
-        const dynamicUnits = getDynamicAreaUnits(5.5);
+        const defaultLaggi = this.settings.settings.defaultLaggi || 5.5;
+        const dynamicUnits = getDynamicAreaUnits(defaultLaggi);
         this.ui.showUnitSection(dynamicUnits);
         this.ui.populateLaggiDropdown();
         this.ui.showLaggiSection();
@@ -455,7 +456,8 @@ class SmartCalculatorApp {
     }
 
     setupLaggiFinder() {
-        const units = getDynamicAreaUnits(5.5); // Just for units list
+        const defaultLaggi = this.settings.settings.defaultLaggi || 5.5;
+        const units = getDynamicAreaUnits(defaultLaggi); // Just for units list
         this.ui.showUnitSection(units);
         this.ui.createConversionInput();
         this.ui.updateUnitSuffix();
@@ -522,13 +524,15 @@ class SmartCalculatorApp {
         }
 
         const baseValue = Calculator.convertLength(value, selectedUnit);
-        this.ui.displayConversionResults(value, selectedUnit, lengthUnits, baseValue, false, 5.5, this.settings.settings);
+        const defaultLaggi = this.settings.settings.defaultLaggi || 5.5;
+        this.ui.displayConversionResults(value, selectedUnit, lengthUnits, baseValue, false, defaultLaggi, this.settings.settings);
     }
 
     handleAreaConversion() {
         const input = document.getElementById('conversionInput');
         const selectedUnit = this.ui.elements.unitType.value;
-        const laggiHands = parseFloat(document.getElementById('areaLaggiHands').value) || 5.5;
+        const defaultLaggi = this.settings.settings.defaultLaggi || 5.5;
+        const laggiHands = parseFloat(document.getElementById('areaLaggiHands').value) || defaultLaggi;
         const value = Calculator.validateInput(input.value);
 
         if (!value || !selectedUnit) {

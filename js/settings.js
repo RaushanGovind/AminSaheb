@@ -21,6 +21,7 @@ class SettingsManager {
                 tradPrecision: 4,
                 stdPrecision: 4,
                 defaultCalc: 'none',
+                defaultLaggi: 5.5,
                 unitPrecisions: defaultPrecisions
             };
 
@@ -35,6 +36,7 @@ class SettingsManager {
                 tradPrecision: 4,
                 stdPrecision: 4,
                 defaultCalc: 'none',
+                defaultLaggi: 5.5,
                 unitPrecisions: defaultPrecisions
             };
         }
@@ -43,9 +45,29 @@ class SettingsManager {
 
     init() {
         this.setupEventListeners();
+        this.populateDefaultLaggiDropdown();
         this.populateUnitPrecisionGrid();
         this.applySettings();
         this.updateUIStrings();
+    }
+
+    populateDefaultLaggiDropdown() {
+        const select = document.getElementById('defaultLaggiInput');
+        if (!select) return;
+        select.innerHTML = '';
+        for (let i = 4; i <= 12; i += 0.25) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            const whole = Math.floor(i);
+            const decimal = i - whole;
+            let label = whole.toString();
+            if (decimal === 0.25) label += '¼';
+            else if (decimal === 0.5) label += '½';
+            else if (decimal === 0.75) label += '¾';
+            opt.textContent = `${label} Hands / हाथ`;
+            if (Math.abs(i - (this.settings.defaultLaggi || 5.5)) < 0.01) opt.selected = true;
+            select.appendChild(opt);
+        }
     }
 
     populateUnitPrecisionGrid() {
@@ -103,6 +125,7 @@ class SettingsManager {
             tradPrecision: document.getElementById('tradPrecision'),
             stdPrecision: document.getElementById('stdPrecision'),
             defaultCalc: document.getElementById('defaultCalcSelect'),
+            defaultLaggi: document.getElementById('defaultLaggiInput'),
             resetBtn: document.getElementById('resetSettings'),
             themeOptions: document.querySelectorAll('.theme-option')
         };
@@ -142,6 +165,7 @@ class SettingsManager {
         if (elements.tradPrecision) elements.tradPrecision.onchange = (e) => this.updateSetting('tradPrecision', parseInt(e.target.value));
         if (elements.stdPrecision) elements.stdPrecision.onchange = (e) => this.updateSetting('stdPrecision', parseInt(e.target.value));
         if (elements.defaultCalc) elements.defaultCalc.onchange = (e) => this.updateSetting('defaultCalc', e.target.value);
+        if (elements.defaultLaggi) elements.defaultLaggi.onchange = (e) => this.updateSetting('defaultLaggi', parseFloat(e.target.value));
 
         elements.themeOptions.forEach(opt => {
             opt.onclick = () => {
@@ -229,6 +253,7 @@ class SettingsManager {
         const tradPrecision = document.getElementById('tradPrecision');
         const stdPrecision = document.getElementById('stdPrecision');
         const defaultCalc = document.getElementById('defaultCalcSelect');
+        const defaultLaggi = document.getElementById('defaultLaggiInput');
 
         if (langHi) langHi.checked = this.settings.lang === 'hi';
         if (fontSelect) fontSelect.value = this.settings.font;
@@ -243,6 +268,7 @@ class SettingsManager {
         if (tradPrecision) tradPrecision.value = this.settings.tradPrecision || 4;
         if (stdPrecision) stdPrecision.value = this.settings.stdPrecision || 4;
         if (defaultCalc) defaultCalc.value = this.settings.defaultCalc || 'none';
+        if (defaultLaggi) defaultLaggi.value = this.settings.defaultLaggi || 5.5;
 
         const activeTheme = document.querySelector(`.theme-option[data-theme="${this.settings.theme}"]`);
         if (activeTheme) {
