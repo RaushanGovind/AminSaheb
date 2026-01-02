@@ -174,7 +174,11 @@ class SmartCalculatorApp {
                 this.setupLandEstimator();
                 break;
             case 'laggiFinder':
+            case 'laggiDiscoveryRelation':
                 this.setupLaggiFinder();
+                break;
+            case 'plotPartition':
+                this.setupPlotPartition();
                 break;
             case 'heron':
                 this.setupTriangleCalculator(calcType);
@@ -203,7 +207,16 @@ class SmartCalculatorApp {
 
     setupBasicCalculator() {
         this.ui.showBasicCalculator();
-        this.basicCalc = new BasicCalculator(this.ui.elements.calcDisplay);
+
+        // Re-use existing instance or create new one, but don't re-attach listeners violently
+        if (!this.basicCalc) {
+            this.basicCalc = new BasicCalculator(this.ui.elements.calcDisplay);
+        } else {
+            this.basicCalc.clear(); // Ensure fresh start
+        }
+
+        // Only attach event listeners ONCE
+        if (this.basicListenersAttached) return;
 
         const calcButtons = document.querySelectorAll('.calc-btn');
         calcButtons.forEach(btn => {
@@ -219,7 +232,11 @@ class SmartCalculatorApp {
                         this.basicCalc.setOperation(value);
                         break;
                     case 'equals':
+                        const expr = this.basicCalc.expression;
                         this.basicCalc.calculate();
+                        if (this.basicCalc.expression !== 'Error' && expr) {
+                            this.ui.saveToHistory('Basic Calculation', expr, this.basicCalc.expression);
+                        }
                         break;
                     case 'clear':
                         this.basicCalc.clear();
@@ -228,10 +245,18 @@ class SmartCalculatorApp {
                         this.basicCalc.delete();
                         break;
                     case 'sqrt':
+                        const valSqrt = this.basicCalc.expression;
                         this.basicCalc.sqrt();
+                        if (this.basicCalc.expression !== 'Error') {
+                            this.ui.saveToHistory('Square Root', `√(${valSqrt})`, this.basicCalc.expression);
+                        }
                         break;
                     case 'sqr':
+                        const valSqr = this.basicCalc.expression;
                         this.basicCalc.sqr();
+                        if (this.basicCalc.expression !== 'Error') {
+                            this.ui.saveToHistory('Square', `(${valSqr})²`, this.basicCalc.expression);
+                        }
                         break;
                 }
             });
@@ -244,15 +269,19 @@ class SmartCalculatorApp {
             } else if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') {
                 this.basicCalc.setOperation(e.key);
             } else if (e.key === 'Enter' || e.key === '=') {
-                e.preventDefault();
+                const expr = this.basicCalc.expression;
                 this.basicCalc.calculate();
-            } else if (e.key === 'Escape' || e.key === 'c' || e.key === 'C') {
-                this.basicCalc.clear();
+                if (this.basicCalc.expression !== 'Error' && expr) {
+                    this.ui.saveToHistory('Basic Calculation', expr, this.basicCalc.expression);
+                }
             } else if (e.key === 'Backspace') {
-                e.preventDefault();
                 this.basicCalc.delete();
+            } else if (e.key === 'Escape') {
+                this.basicCalc.clear();
             }
         });
+
+        this.basicListenersAttached = true;
     }
 
     setupLengthCalculator() {
@@ -523,6 +552,14 @@ class SmartCalculatorApp {
         }
 
         const baseDhur = value * landMicroUnits[selectedUnit];
+
+        // Save to History
+        this.ui.saveToHistory(
+            'Land Unit Conversion',
+            `Input: ${value} ${selectedUnit}`,
+            `= ${baseDhur.toFixed(4)} Dhur (Base)`
+        );
+
         this.ui.displayLandMicroResults(value, selectedUnit, baseDhur, this.settings.settings);
     }
 
@@ -682,5 +719,15 @@ class SmartCalculatorApp {
         if (nearestValid > 12) nearestValid = 12;
 
         this.ui.displayLaggiFinderResult(value, selectedUnit, laggiHath, isValid, nearestValid);
+    }
+
+    setupLaggiFinder() {
+        this.ui.createLaggiDiscoveryRelationUI();
+        this.ui.elements.calculateBtnContainer.classList.add('hidden');
+    }
+
+    setupPlotPartition() {
+        this.ui.createPlotPartitionUI();
+        this.ui.elements.calculateBtnContainer.classList.add('hidden');
     }
 }

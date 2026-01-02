@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Calculator | Modern & Precise</title>
+    <meta name="description"
+        content="A professional-grade calculator with a modern, glassmorphic UI. Support for Basic and Scientific modes with Light, Dark, and AMOLED themes.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/pro-calculator.css">
+</head>
+
+<body class="theme-dark">
+    <div class="app-container">
+        <!-- Floating Decoration Elements -->
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+
+        <div class="calculator-wrapper">
+            <!-- Header / Status Bar -->
+            <header class="calc-header">
+                <div class="mode-toggle">
+                    <button id="basicModeBtn" class="mode-btn active">Basic</button>
+                    <button id="sciModeBtn" class="mode-btn">Scientific</button>
+                </div>
+                <div class="theme-switcher">
+                    <button id="themeCycleBtn" class="icon-btn" title="Change Theme">
+                        <svg class="theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <span id="themeLabel">Dark</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Display Area -->
+            <div class="calc-display-section">
+                <div class="glass-reflection"></div>
+                <div class="history-line" id="historyLine"></div>
+                <div class="main-display" id="mainDisplay">0</div>
+                <div class="cursor"></div>
+            </div>
+
+            <!-- Scientific Keys (Hidden by default) -->
+            <div class="scientific-keys hidden" id="scientificKeys">
+                <div class="keypad-row">
+                    <button class="btn btn-sci" data-op="sin">sin</button>
+                    <button class="btn btn-sci" data-op="cos">cos</button>
+                    <button class="btn btn-sci" data-op="tan">tan</button>
+                    <button class="btn btn-sci" data-op="log">log</button>
+                </div>
+                <div class="keypad-row">
+                    <button class="btn btn-sci" data-op="pow">xⁿ</button>
+                    <button class="btn btn-sci" data-op="sqrt">√</button>
+                    <button class="btn btn-sci" data-op="pi">π</button>
+                    <button class="btn btn-sci" data-op="e">e</button>
+                </div>
+            </div>
+
+            <!-- Standard Keypad -->
+            <div class="standard-keypad">
+                <div class="keypad-row">
+                    <button class="btn btn-action" data-action="clear">AC</button>
+                    <button class="btn btn-action" data-action="delete">DEL</button>
+                    <button class="btn btn-operator" data-op="mod">%</button>
+                    <button class="btn btn-operator" data-op="divide">÷</button>
+                </div>
+                <div class="keypad-row">
+                    <button class="btn btn-num">7</button>
+                    <button class="btn btn-num">8</button>
+                    <button class="btn btn-num">9</button>
+                    <button class="btn btn-operator" data-op="multiply">×</button>
+                </div>
+                <div class="keypad-row">
+                    <button class="btn btn-num">4</button>
+                    <button class="btn btn-num">5</button>
+                    <button class="btn btn-num">6</button>
+                    <button class="btn btn-operator" data-op="subtract">−</button>
+                </div>
+                <div class="keypad-row">
+                    <button class="btn btn-num">1</button>
+                    <button class="btn btn-num">2</button>
+                    <button class="btn btn-num">3</button>
+                    <button class="btn btn-operator" data-op="add">+</button>
+                </div>
+                <div class="keypad-row">
+                    <button class="btn btn-num btn-double">0</button>
+                    <button class="btn btn-num">.</button>
+                    <button class="btn btn-equals">=</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="app-footer">
+            <p>© 2026 PRO CALCULATOR | Premium Fintech UI</p>
+        </footer>
+    </div>
+
+    <!-- JS -->
+    <script src="js/pro-calculator.js"></script>
+</body>
+
+</html>

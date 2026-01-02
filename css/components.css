@@ -5,20 +5,19 @@
     background: var(--bg-card);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-radius: var(--radius-xl);
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
     padding: var(--space-4) var(--space-6);
-    margin-bottom: var(--space-8);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: fixed;
     top: 0;
-    left: 10px;
-    right: 10px;
-    z-index: 20000;
-    margin-top: 10px;
+    left: 0;
+    right: 0;
+    z-index: 9999;
     animation: slideDown 0.5s ease-out;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.1);
 }
 
 /* Decorative gradient border */
@@ -1452,3 +1451,109 @@
         padding: 8px;
     }
 }
+
+/* Header Navigation - Specific Fixes */
+.nav-dropdown-wrapper {
+    position: relative;
+    margin-right: var(--space-2);
+}
+
+.nav-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--bg-white);
+    border: 1px solid var(--primary-100);
+    border-radius: var(--radius-full);
+    padding: 10px 35px 10px 15px;
+    font-size: 0.9rem;
+    font-family: var(--font-primary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    max-width: 200px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    transition: all 0.2s;
+}
+
+.nav-select:hover {
+    border-color: var(--primary-500);
+    box-shadow: var(--shadow-md);
+}
+
+.nav-select:focus {
+    outline: none;
+    border-color: var(--primary-600);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+@media (max-width: 768px) {
+    .nav-select {
+        max-width: 140px;
+        padding: 8px 30px 8px 12px;
+        font-size: 0.8rem;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+
+    .settings-trigger {
+        width: 36px;
+        height: 36px;
+        font-size: 1.1rem;
+    }
+}
+
+/* Calculator Selector Fixes */
+.calculator-selector {
+    padding-top: 10px;
+    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+}
+
+.selector-title {
+    margin-bottom: 30px;
+    text-align: center;
+    font-weight: 800;
+    color: var(--text-primary);
+    position: relative;
+    z-index: 5;
+    width: 100%;
+}
+/* Collapsible Header Style */
+.collapsible-header {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2) var(--space-3);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.collapsible-header:hover {
+    background: var(--bg-white);
+    border-color: var(--primary-200);
+    box-shadow: var(--shadow-sm);
+    color: var(--primary-600);
+}
+
+
+/* Push header buttons to right */
+.nav-dropdown-wrapper {
+    margin-right: auto !important;
+}
+

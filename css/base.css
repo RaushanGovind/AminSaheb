@@ -118,6 +118,8 @@ p {
     max-width: 900px;
     margin: 0 auto;
     padding: var(--space-6) 0;
+    padding-top: 90px;
+    /* Space for fixed header */
     position: relative;
     z-index: 1;
     animation: fadeInUp 0.6s ease-out;
@@ -166,6 +168,8 @@ p {
 
     .main-container {
         padding: var(--space-4) 0;
+        padding-top: 85px;
+        /* Adjusted for mobile header */
     }
 }
 
@@ -180,6 +184,8 @@ p {
 
     .main-container {
         padding: var(--space-3) 0;
+        padding-top: 80px;
+        /* Adjusted for small mobile header */
     }
 }
 
@@ -200,3 +206,36 @@ input,
 select {
     transition: all var(--transition-base);
 }
+
+/* Main App Container - Fix Header Overlap */
+.main-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding-top: 100px;
+    /* Reduced from 160px */
+    /* Ensure content starts below fixed header */
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+    padding-bottom: 200px;
+    /* Space for footer */
+    position: relative;
+    z-index: 10;
+}
+
+@media (max-width: 768px) {
+    .main-container {
+        padding-top: 90px;
+    }
+}
+/* Remove Arrows/Spinners from Number Inputs */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+

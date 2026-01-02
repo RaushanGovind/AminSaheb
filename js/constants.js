@@ -61,10 +61,12 @@ const calculatorTitles = {
     square: "Square Area / वर्ग का क्षेत्रफल",
     rectangle: "Rectangle Area / आयत का क्षेत्रफल",
     laggi: "Laggi Land Measurement / लग्गी मापन",
-    landConverter: "Land Unit Converter",
-    specialArea: "Special Area Converter",
-    landEstimator: "Land Area Estimator",
-    laggiFinder: "Laggi Discovery (लग्गी पहचान)"
+    landConverter: "Land Unit Converter / भूमि इकाई कनवर्टर",
+    specialArea: "Special Area Converter / विशेष क्षेत्रफल कनवर्टर",
+    landEstimator: "Land Area Estimator / भूमि रकबा कैलकुलेटर",
+    laggiFinder: "Laggi Discovery (लग्गी पहचान)",
+    laggiDiscoveryRelation: "Laggi Discovery (Two-Way Relation) / लग्गी पहचान (संबंध विधि)",
+    plotPartition: "Land Partition / भूमि बंटवारा"
 };
 
 const calculatorCards = [
@@ -77,7 +79,8 @@ const calculatorCards = [
     { id: 'landConverter', icon: '🔄', color: 'gradient-purple', tag: '🔄', title: 'Land Unit Converter', desc: 'इकाई कनवर्टर', features: ['बीघा-कट्ठा-धुर', 'धुरकी-फुरकी-चुरकी'], style: 'background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);' },
     { id: 'specialArea', icon: '🗺️', color: 'gradient-ocean', tag: '🗺️', title: 'Special Area Converter', desc: 'विशेष क्षेत्रफल कनवर्टर', features: ['मिश्रित इनपुट', 'हेक्टर-एकड़-डिसमिल', 'बीघा-कट्ठा-कनबा'], style: 'background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);' },
     { id: 'landEstimator', icon: '🏗️', color: 'gradient-yellow', tag: '🏗️', title: 'Land Area Estimator', desc: 'रकबा का जोड (कुल रकबा)', features: ['मल्टी-रो (Multi-Row)', 'क्षेत्रफल का जोड़', 'बीघा-धुर-डिसमिल'], style: 'background: var(--gradient-yellow);' },
-    { id: 'laggiFinder', icon: '🔍', color: 'gradient-primary', tag: '<span>🔍</span>', title: 'Laggi Discovery', desc: 'लग्गी पहचान (Find Laggi)', features: ['क्षेत्रफल से लग्गी', 'मान्य/अमान्य जाँच', 'सुझाव एवं नियम'], style: 'background: var(--gradient-primary); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);' }
+    { id: 'laggiDiscoveryRelation', icon: '🔍', color: 'gradient-primary', tag: '<span>🔍</span>', title: 'Laggi Discovery', desc: 'लग्गी पहचान (Find Laggi)', features: ['क्षेत्रफल से लग्गी', 'रिलेशन चेक', 'सुझाव एवं नियम'], style: 'background: var(--gradient-primary); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);' },
+    { id: 'plotPartition', icon: '🏢', color: 'gradient-green', tag: '<span>🏢</span>', title: 'Land Partition', desc: 'भूमि बंटवारा (Bantwara)', features: ['Residential Plot', 'Agricultural Land', 'Smart Division'], style: 'background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);' }
 ];
 
 const precisionUnits = [
@@ -89,7 +92,7 @@ const translations = {
     hi: {
         mainTitle: "अमीन साहेब",
         mainTagline: "सटीक गणना, आसान तरीका",
-        selectorTitle: "अपना कैलकुलेटर चुनें",
+        selectorTitle: "Choose Your Calculator / अपना कैलकुलेटर चुनें",
         settingsTitle: "सेटिंग्स (Settings)",
         langLabel: "भाषा (Language)",
         themeLabel: "थीम (Theme)",
@@ -115,9 +118,9 @@ const translations = {
         textColorLabel: "फ़ॉन्ट का रंग (Text Color)",
         specialConverter: "विशेष क्षेत्र कनवर्टर",
         inputGroupLabel: "इनपुट समूह (Input Group)",
-        compositeFormat: "1. मिश्रित प्रारूप (Composite)",
-        kanbaFormat: "2. कनबा प्रारूप (Kanba)",
-        standardFormat: "3. मानक प्रारूप (Standard)",
+        compositeFormat: "Composite (मिश्रित)",
+        kanbaFormat: "Kanba (कनबा)",
+        standardFormat: "Standard (मानक)",
         landEstimator: "भूमि अनुमानक (Estimator)",
         addRowBtn: "+ पंक्ति जोड़ें",
         totalEstimate: "कुल अनुमानित क्षेत्रफल",
@@ -169,9 +172,9 @@ const translations = {
         stdPrecisionLabel: "Standard (SqFt/etc)",
         specialConverter: "Special Area Converter",
         inputGroupLabel: "Select Input Group (इनपुट समूह)",
-        compositeFormat: "1. Composite (बीघा-धुर-धुरकी)",
-        kanbaFormat: "2. Kanba (बीघा-कट्ठा-कनबा)",
-        standardFormat: "3. Modern (हेक्टर-एकड़-डिसमिल)",
+        compositeFormat: "Composite",
+        kanbaFormat: "Kanba",
+        standardFormat: "Standard",
         landEstimator: "Land Area Estimator",
         addRowBtn: "+ Add Row",
         totalEstimate: "Total Estimated Area",
